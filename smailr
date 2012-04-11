@@ -1,12 +1,17 @@
 #!/usr/bin/env ruby
+#
+# Copyright 2012, Stefan Schlesinger <sts@ono.at>
+#
 
 require 'rubygems'
 require 'bundler/setup'
 Bundler.require(:default)
+
 require 'thor/group'
 require 'digest/md5'
 
 DB = Sequel.sqlite :database => 'smailr.sqlite'
+
 
 ##
 ## Model
@@ -24,8 +29,7 @@ class Mailbox < Sequel::Model
     end
 end
 
-class Alias < Sequel::Model
-end
+class Alias < Sequel::Model; end
 
 
 ##
@@ -89,7 +93,6 @@ class SmailrCLI < Thor
 
     register(DomainCLI, 'domain', 'domain <command>', 'Edit domain properties')
     register(MboxCLI,   'mbox',   'mbox <domain> <command>', 'Edit mailbox properties')
-
 
     desc 'setup', 'Setup a sqlite database at the specified location.'
     def setup
