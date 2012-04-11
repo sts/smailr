@@ -10,6 +10,7 @@ This is still in development.
  * Run the setup command
 
     cd /etc/exim4
+
     smailr setup
 
 
