@@ -10,7 +10,7 @@ Bundler.require(:default)
 require 'thor/group'
 require 'digest/md5'
 
-DB = Sequel.sqlite :database => 'smailr.sqlite'
+DB = Sequel.sqlite :database => '/etc/exim4/smailr.sqlite'
 
 
 ##
