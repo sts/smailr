@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 require 'rubygems'
 require 'bundler/setup'
@@ -6,7 +6,11 @@ Bundler.require(:default)
 require 'thor/group'
 require 'digest/md5'
 
-DB = Sequel.sqlite :database => 'smailr.db'
+DB = Sequel.sqlite :database => 'smailr.sqlite'
+
+##
+## Model
+##
 
 class Domain < Sequel::Model
     one_to_many :mailboxes
@@ -32,7 +36,7 @@ class DomainCLI < Thor
     namespace :domain
 
     desc 'list', 'List the current domains'
-    def list()
+    def list
         domains = DB[:domains]
         domains.all.each do |d| 
             puts d[:fqdn]
@@ -49,10 +53,6 @@ class DomainCLI < Thor
         domain = Domain[:fqdn => fqdn]
         domain.destroy
     end
-
-    ## Update
-    #d = Domain[:fqdn => 'ono.at']
-    #d.update(:fqdn => 'ono2.at')
 end
 
 class MboxCLI < Thor
@@ -85,29 +85,37 @@ class MboxCLI < Thor
 end
 
 class SmailrCLI < Thor
+    include Thor::Actions
+
     register(DomainCLI, 'domain', 'domain <command>', 'Edit domain properties')
     register(MboxCLI,   'mbox',   'mbox <domain> <command>', 'Edit mailbox properties')
 
-    desc 'setup', 'Setup a sqlite database'
+
+    desc 'setup', 'Setup a sqlite database at the specified location.'
     def setup
-        DB.create_table :domains do 
-            primary_key :id
-            column :fqdn, :string, :unique => true
-        end
+        say("Initializing Smailr Database: smailr.sqlite")
 
-        DB.create_table :mailboxes do 
-            primary_key :id
-            foreign_key :domain_id
-            column :localpart, :string, :required => true
-            column :password,  :string, :required => true
-        end
+        begin
+            DB.create_table :domains do 
+                primary_key :id
+                column :fqdn, :string, :unique => true
+            end
 
+            DB.create_table :mailboxes do 
+                primary_key :id
+                foreign_key :domain_id
+                column :localpart, :string, :required => true
+                column :password,  :string, :required => true
+            end
 
-        DB.create_table :aliases do
-            primary_key :id
-            column :domain, :string, :required => true
-            column :localpart, :string, :required => true
-            column :forward, :string, :requred => true
+            DB.create_table :aliases do
+                primary_key :id
+                column :domain, :string, :required => true
+                column :localpart, :string, :required => true
+                column :forward, :string, :requred => true
+            end
+        rescue
+            say("ERROR: Creation of database failed.")
         end
     end
 end
