@@ -1,7 +1,7 @@
 # Smailr - A Virtual Mail Hosting Management CLI
 
 Smailr is a small CLI application, which lets you manage a typical Exim / Dovecot stack.
-
+This is still in development.
 
 ## Installation
 
@@ -9,12 +9,13 @@ Smailr is a small CLI application, which lets you manage a typical Exim / Doveco
 
  * Run the setup command
 
-    smailr setup sqlite:///etc/exim/smailr.sqlite3
+    cd /etc/exim4
+    smailr setup
 
 
 ## Managing Domains and Users
 
-## Domain Object
+### Domain Object
 
     smailr domain add example.com
 
@@ -22,7 +23,7 @@ Smailr is a small CLI application, which lets you manage a typical Exim / Doveco
 
     smailr domain rm example.com
 
-## Mailbox Object
+### Mailbox Object
 
     smailr mbox add user@example.com secretpass
 
@@ -30,3 +31,14 @@ Smailr is a small CLI application, which lets you manage a typical Exim / Doveco
 
     smailr mbox list example.com
 
+
+## BUGS
+
+For bugs or feature requests, please use the GitHub issue tracker.
+
+https://github.com/sts/smailr/issues
+
+
+## WHO
+
+Stefan Schlesinger / sts@ono.at / @stsonoat / http://sts.ono.at
