@@ -109,6 +109,7 @@ class SmailrCLI < Thor
                 foreign_key :domain_id
                 column :localpart, :string, :required => true
                 column :password,  :string, :required => true
+                index [:domain_id, :localpart], :unique => true
             end
 
             DB.create_table :aliases do
@@ -116,6 +117,7 @@ class SmailrCLI < Thor
                 column :domain, :string, :required => true
                 column :localpart, :string, :required => true
                 column :forward, :string, :requred => true
+                index [:domain, :localpart], :unique => true
             end
         rescue
             say("ERROR: Creation of database failed.")
