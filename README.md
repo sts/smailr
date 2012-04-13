@@ -1,6 +1,10 @@
 # Smailr - A Virtual Mail Hosting Management CLI
 
 Smailr is a small CLI application, which lets you manage a typical Exim / Dovecot stack.
+
+I personally dont really like installing a webserver and mysql for my personal mailserver,
+and I dont need advanced features of vexim 
+
 This is still in development.
 
 ## Installation
@@ -17,12 +21,18 @@ Install the example Exim and Dovecot configration files on your mailserver.
     invoke-rc.d exim4 restart
     invoke-rc.d dovecot restart
 
+Add a user which will own the mails and is used for the LDA
+
+    useradd -r -d /srv/mail vmail
+    mkdir /srv/mail/users
+    chown -R vmail:vmail /srv/mail
+
 Run the setup command to initialize the smailr database in 
 
     # Creates /etc/exim4/smailr.sqlite
     smailr setup
 
-Add a domain and a user
+Add a domain and an user to your database using the commands listed below.
 
 
 ## Managing Domains and Users

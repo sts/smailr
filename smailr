@@ -114,9 +114,8 @@ class SmailrCLI < Thor
 
             DB.create_table :aliases do
                 primary_key :id
-                column :domain, :string, :required => true
-                column :localpart, :string, :required => true
-                column :forward, :string, :requred => true
+                column :mailbox_id, :string, :required => true
+                column :alias, :string, :requred => true
                 index [:domain, :localpart], :unique => true
             end
         rescue
