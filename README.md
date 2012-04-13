@@ -12,7 +12,7 @@ Install Exim and Dovecot
 Install the example Exim and Dovecot configration files on your mailserver.
 
     cp contrib/exim4.conf /etc/exim4/exim4.conf
-    chown root:Debian-exim/etc/exim4/exim4.conf
+    chown root:Debian-exim /etc/exim4/exim4.conf
     cp contrib/dovecot* /etc/dovecot/
     invoke-rc.d exim4 restart
     invoke-rc.d dovecot restart
