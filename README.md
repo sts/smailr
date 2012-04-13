@@ -5,13 +5,24 @@ This is still in development.
 
 ## Installation
 
- * Install the attached exim and dovecot configration files on your mailserver.
+ * Install Exim and Dovecot
 
- * Run the setup command
+    aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
 
-    cd /etc/exim4
+ * Install the example Exim and Dovecot configration files on your mailserver.
 
+    cp contrib/exim4.conf /etc/exim4/exim4.conf
+    chown root:Debian-exim/etc/exim4/exim4.conf
+    cp contrib/dovecot* /etc/dovecot/
+    invoke-rc.d exim4 restart
+    invoke-rc.d dovecot restart
+
+ * Run the setup command to initialize the smailr database in 
+
+    # Creates /etc/exim4/smailr.sqlite
     smailr setup
+
+ * Add a domain and a user
 
 
 ## Managing Domains and Users
