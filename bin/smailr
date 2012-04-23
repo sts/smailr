@@ -3,7 +3,7 @@ $: << File.join(File.dirname(__FILE__), ".." , "lib")
 
 require 'smailr'
 
-DB = Sequel.connect("sqlite:///Users/sts/smailr.sqlite")
+DB = Sequel.connect("sqlite:///etc/exim4/smailr.sqlite")
 
 #
 # Helpers
