@@ -1,17 +1,9 @@
 #!/usr/bin/env ruby
-$:.push("lib")
+$: << File.join(File.dirname(__FILE__), ".." , "lib")
 
-require 'rubygems'
-require 'bundler/setup'
-Bundler.require(:default)
-require 'commander/import'
 require 'smailr'
 
-
-program :version, '0.1'
-program :description, 'Simple Mail Manager'
-
-DB = Sequel.sqlite :database => '/etc/exim4/smailr.sqlite'
+DB = Sequel.connect("sqlite:///Users/sts/smailr.sqlite")
 
 #
 # Helpers
@@ -25,7 +17,7 @@ end
 # Commands
 #
 command :add do |c|
-    c.syntax = 'emmr add domain | mailbox [options]'
+    c.syntax = 'smailr add domain | mailbox [options]'
     c.summary = 'Add a domain or addresses to the mail system.'
     c.example 'Add a domain',  'smailr add example.com'
     c.example 'Add a mailbox', 'smailr add user@localdomain.com'
@@ -49,14 +41,17 @@ command :add do |c|
 end
 
 command :ls do |c|
-    c.syntax  = 'emmr ls [domain]'
+    c.syntax  = 'smailr ls [domain]'
     c.summary = 'List domains or mailboxes of a specific domain.'
     c.action do |args, options|
         case args[0]
             when /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i then
                 domain = Smailr::Model::Domain[:fqdn => args[0]]
                 domain.mailboxes.each do |mbox|
-                    puts "#{mbox.localpart}@#{args[0]}"
+                    puts "m: #{mbox.localpart}@#{args[0]}"
+                    mbox.aliases.each do |aalias|
+                        puts "a: #{aalias.address} > #{mbox.localpart}@#{args[0]}"
+                    end
                 end
             when nil
                 domains = DB[:domains]
@@ -66,30 +61,34 @@ command :ls do |c|
                 end
             else
                 error "You can either list a domains or an addresses."
+                exit 1
         end
     end
 end
 
 command :rm do |c|
-    c.syntax  = 'emmr rm domain | mailbox | alias'
+    c.syntax  = 'smailr rm domain | mailbox [options]'
     c.summary = 'Remove a domain, mailbox or alias known to the mail system.'
     c.example 'Remove a domain', 'smailr rm ono.at'
     c.option  '--force', 'Force the operation, do not ask for confirmation.'
+    c.option '--alias STRING',    String, 'Specify the alias which you want to remove.'
     c.action do |args, options|
         type = determine_object(args[0])
         case type
             when :domain
                 Smailr::Domain.rm(args[0], options)
             when :address
-                Smailr::Mailbox.rm(args[0], options)
+                Smailr::Alias.rm(args[0], options)   if options.alias
+                Smailr::Mailbox.rm(args[0], options) if not options.alias
             else
-                error "You can either remove a domain or an address."
+                say_error "You can either remove a domain or an address."
+                exit 1
         end
     end
 end
 
 command :setup do |c|
-    c.syntax  = 'emmr setup'
+    c.syntax  = 'smailr setup'
     c.summary = 'Initialize the database.'
     c.action do |args, options|
         DB.create_table :domains do

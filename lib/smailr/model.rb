@@ -18,10 +18,6 @@ module Smailr
 
         class Alias < Sequel::Model
             many_to_one :mailbox
-
-            def domain
-                mailbox.domain if mailbox
-            end
         end
 
     end
