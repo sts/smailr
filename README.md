@@ -37,21 +37,17 @@ Add a domain and an user to your database using the commands listed below.
 
 ## Managing Domains and Users
 
-### Domain Object
+### Domains
 
-    smailr domain add example.com
+    smailr add example.com
 
-    smailr domain list
-
-    smailr domain rm example.com
+    smailr rm example.com
 
 ### Mailbox Object
 
-    smailr mbox add user@example.com secretpass
+    smailr add user@example.com
 
-    smailr mbox rm user@example.com
-
-    smailr mbox list example.com
+    smailr rm user@example.com
 
 
 ## BUGS
