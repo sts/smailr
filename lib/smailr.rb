@@ -1,8 +1,6 @@
 require 'rubygems'
-require 'bundler/setup'
-
-Bundler.require(:default)
-
+require 'sqlite3'
+require 'sequel'
 require 'commander/import'
 
 module Smailr
@@ -11,6 +9,6 @@ module Smailr
     autoload :Mailbox, 'smailr/mailbox'
     autoload :Alias,   'smailr/alias'
 
-    program :version, '0.1'
+    program :version, '0.2.0'
     program :description, 'Simple MAIL mangaR - Virtual mail hosting management from the CLI'
 end

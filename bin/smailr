@@ -87,29 +87,18 @@ command :rm do |c|
     end
 end
 
-command :setup do |c|
-    c.syntax  = 'smailr setup'
-    c.summary = 'Initialize the database.'
-    c.action do |args, options|
-        DB.create_table :domains do
-            primary_key :id
-            column :fqdn, :string, :unique => true
-        end
+command :migrate do |c|
+    c.syntax  = 'smailr migrate [options]'
+    c.summary = 'Run database migrations'
+    c.option '--to VERSION', String, 'Migrate the database to a specifict version.'
+    c.action do |args,options|
+        require 'sequel/extensions/migration'
+        raise "Database not configured" unless DB
 
-        DB.create_table :mailboxes do
-            primary_key :id
-            foreign_key :domain_id
-            column :localpart, :string, :required => true
-            column :password,  :string, :required => true
-            index [:domain_id, :localpart], :unique => true
-        end
-
-        DB.create_table :aliases do
-            primary_key :id
-            foreign_key :mailbox_id
-            column      :address, :string, :required => true
-            index [:address, :mailbox_id], :unique => true
-            index :address
+        if options.version.nil?
+            Sequel::Migrator.apply(DB, 'migrations' )
+        else
+            Sequel::Migrator.apply(DB, 'migrations', :target => options.version.to_i)
         end
     end
 end

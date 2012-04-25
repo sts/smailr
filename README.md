@@ -27,10 +27,10 @@ Add a user which will own the mails and is used for the LDA
     mkdir /srv/mail/users
     chown -R vmail:vmail /srv/mail
 
-Run the setup command to initialize the smailr database in 
+Run the setup command to initialize the smailr database
 
     # Creates /etc/exim4/smailr.sqlite
-    smailr setup
+    smailr migrate
 
 Add a domain and an user to your database using the commands listed below.
 
