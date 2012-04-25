@@ -4,32 +4,27 @@ module Smailr
             mbox_localpart, mbox_fqdn = address.split('@')
             alias_localpart, alias_fqdn = options.alias.split('@')
 
-            # Check if alias_fqdn is a local domain
-            if Model::Domain.where(:fqdn => alias_fqdn).empty?
+            # We don't want aliases for non-local domains, since the
+            # exim router won't accept it.
+            if not Model::Alias.domain(alias_fqdn).exists?
                 say_error "You are trying to add an alias for a non-local domain: #{alias_fqdn}"
                 exit 1
             end
 
-            # Lookup the mbox object
-            mbox = Model::Mailbox[ :localpart => mbox_localpart,
-                                   :domain    => Model::Domain.where(:fqdn=> mbox_fqdn) ]
-            if not mbox
+            mbox = Model::Alias.mbox_for_address(address)
+
+            # We don't want aliases which cannot be routed to a mailbox.
+            if not mbox.exists?
                 say_error "You are trying to add an alias for a non existing mailbox: #{address}"
-                exit
+                exit 1
             end
 
             mbox.add_alias(:address => options.alias)
         end
 
         def self.rm(address, options)
-            mbox_localpart, mbox_fqdn = address.split('@')
-
-            # Lookup the mbox object
-            mbox = Model::Mailbox[ :localpart => mbox_localpart,
-                                   :domain    => Model::Domain.where(:fqdn=> mbox_fqdn) ]
-
+            mbox = Model::Alias.mbox_for_address(address)
             mbox.remove_alias(Model::Alias[:address => options.alias])
         end
-
     end
 end
