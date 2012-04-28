@@ -69,7 +69,7 @@ end
 command :rm do |c|
     c.syntax  = 'smailr rm domain | mailbox [options]'
     c.summary = 'Remove a domain, mailbox or alias known to the mail system.'
-    c.example 'Remove a domain', 'smailr rm ono.at'
+    c.example 'Remove a domain', 'smailr rm example.com'
     c.option  '--force', 'Force the operation, do not ask for confirmation.'
     c.option '--alias STRING',    String, 'Specify the alias which you want to remove.'
     c.action do |args, options|
@@ -99,6 +99,22 @@ command :migrate do |c|
             Sequel::Migrator.apply(DB, 'migrations' )
         else
             Sequel::Migrator.apply(DB, 'migrations', :target => options.version.to_i)
+        end
+    end
+end
+
+command :mutt do |c|
+    c.syntax      = "smailr mutt address"
+    c.summary     = "View the mailbox of the specified address in mutt."
+    c.description = "Open the mailbox of the specified address in mutt.\n\n    " +
+                    "Requires that mutt is installed and assumes the default mail\n    " +
+                    "storage directory structure: /srv/mail/users/<fqdn>/<localpart>"
+    c.example       'Open test@example.com', 'smailr mutt test@example.com'
+    c.action do |args,options|
+        localpart, fqdn = args[0].split('@')
+        `command -v mutt >/dev/null 2>&1 || { echo "Please install mutt first. Aborting." >&2; exit 1; }`
+        if not $?
+            exec "MAIL=/srv/mail/users/#{fqdn}/#{localpart} MAILDIR=$MAIL mutt -mMaildir]"
         end
     end
 end
