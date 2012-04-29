@@ -1,4 +1,4 @@
-# Smailr - A Virtual Mail Hosting Management CLI (NOTE: STILL IN DEVELOPMENT)
+# Smailr - A Virtual Mail Hosting Management CLI (BETA)
 
 Smailr is a small CLI application, which lets you manage a typical Exim / Dovecot stack.
 
@@ -75,6 +75,12 @@ Simply add an 'user-alias@example.com' alias to the 'user@example.com' mailbox.
 
     smailr add user@example.com --alias user-alias@example.com
 
+### Mutt
+
+Smailr can launch mutt with the required configuration for a specific mailbox
+automatically. Open mutt for the specified mailbox:
+
+    smailr mutt user@example.com
 
 ## BUGS
 
