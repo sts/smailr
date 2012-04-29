@@ -8,6 +8,7 @@ module Smailr
     autoload :Domain,  'smailr/domain'
     autoload :Mailbox, 'smailr/mailbox'
     autoload :Alias,   'smailr/alias'
+    autoload :Dkim,    'smailr/dkim'
 
     program :version, '0.2.0'
     program :description, 'Simple MAIL mangaR - Virtual mail hosting management from the CLI'

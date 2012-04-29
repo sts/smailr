@@ -22,20 +22,25 @@ command :add do |c|
     c.example 'Add a domain',  'smailr add example.com'
     c.example 'Add a mailbox', 'smailr add user@localdomain.com'
     c.example 'Add an alias',  'smailr add user@localdomain.com --alias alias@localdomain.com'
-    c.option '--alias STRING',    String, 'Specify an alias to create for a mailbox.'
-    c.option '--password STRING', String, 'The password for a new mailbox. If you omit this option, it prompts for one.'
-
+    c.example 'Setup DKIM for a domain', 'smailr add ono.at --dkim'
+    c.option  '--alias STRING',    String,  'Specify an alias to create for a mailbox.'
+    c.option  '--password STRING', String,  'The password for a new mailbox. If you omit this option, it prompts for one.'
+    c.option  '--dkim',            String,  'Add a DKIM Key for a domain'
     c.action do |args, options|
         address = args[0]
         type    = determine_object(address)
+
         case type
             when :domain
-                Smailr::Domain.add(address)
+                if options.dkim
+                    Smailr::Dkim.add(address, options)
+                else
+                    Smailr::Domain.add(address)
+                end
+
             when :address
                 Smailr::Alias.add(address, options) if options.alias
                 Smailr::Mailbox.add(address, options) if not options.alias
-            else
-                say_error  "You can either add a domain or an address."
         end
     end
 end
@@ -70,19 +75,23 @@ command :rm do |c|
     c.syntax  = 'smailr rm domain | mailbox [options]'
     c.summary = 'Remove a domain, mailbox or alias known to the mail system.'
     c.example 'Remove a domain', 'smailr rm ono.at'
-    c.option  '--force', 'Force the operation, do not ask for confirmation.'
+    c.option '--force', 'Force the operation, do not ask for confirmation.'
+    c.option '--dkim',  'Remove a dkim key.' 
     c.option '--alias STRING',    String, 'Specify the alias which you want to remove.'
     c.action do |args, options|
-        type = determine_object(args[0])
+        address = args[0]
+        type    = determine_object(address)
         case type
             when :domain
-                Smailr::Domain.rm(args[0], options)
+                if options.dkim
+                    Smailr::Dkim.rm(address, options)
+                else
+                    Smailr::Domain.rm(address, options)
+                end
+
             when :address
-                Smailr::Alias.rm(args[0], options)   if options.alias
-                Smailr::Mailbox.rm(args[0], options) if not options.alias
-            else
-                say_error "You can either remove a domain or an address."
-                exit 1
+                Smailr::Alias.rm(address, options)   if options.alias
+                Smailr::Mailbox.rm(address, options) if not options.alias
         end
     end
 end
@@ -102,3 +111,4 @@ command :migrate do |c|
         end
     end
 end
+

@@ -2,6 +2,19 @@ module Smailr
     module Model
         class Domain < Sequel::Model
             one_to_many :mailboxes
+            many_to_one :dkim
+        end
+
+        class Dkim < Sequel::Model
+            many_to_one :domain
+
+            def self.for_domain(fqdn)
+                self[:domain => Domain[:fqdn => fqdn]]
+            end
+
+            def self.for_domain!(fqdn)
+                find_or_create(:domain => Domain[:fqdn => fqdn])
+            end
         end
 
         class Mailbox < Sequel::Model
@@ -13,30 +26,23 @@ module Smailr
             end
 
             def self.domain(fqdn)
-                return Domain[:fqdn => fqdn]
+                Domain[:fqdn => fqdn]
             end
 
             def self.for_address(address)
                 localpart, fqdn = address.split('@')
-
-                return self[:localpart => localpart,
-                            :domain    => domain(fqdn)]
+                self[:localpart => localpart, :domain => domain(fqdn)]
             end
+
+            def self.for_address!(address)
+                localpart, fqdn = address.split('@')
+                find_or_create(:localpart => localpart, :domain => domain(fqdn))
+            end
+
         end
 
         class Alias < Sequel::Model
             many_to_one :mailbox
-
-            def self.domain(fqdn)
-                return Domain[:fqdn => fqdn]
-            end
-
-            def self.mbox_for_address(address)
-                localpart, fqdn = address.split('@')
-
-                return Mailbox[:localpart => localpart,
-                               :domain    => domain(fqdn)]
-            end
         end
     end
 end
