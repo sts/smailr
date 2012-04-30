@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 module Smailr
     module Model
         class Domain < Sequel::Model
