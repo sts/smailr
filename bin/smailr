@@ -32,7 +32,7 @@ def ask_password
 end
 
 program :version, Smailr::VERSION
-program :description, 'Simple MAIL mangaR - Virtual mail hosting management from the CLI'
+program :description, 'Simple MAIL manageR - Virtual mail hosting management from the CLI'
 
 #
 # Commands
