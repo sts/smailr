@@ -98,6 +98,11 @@ automatically. Open mutt for the specified mailbox:
 
     smailr mutt user@example.com
 
+## Compatibility
+
+Smailr was developed an tested on Debian/Squeeze and should be easily portable
+to any other system.
+
 ## BUGS
 
 For bugs or feature requests, please use the GitHub issue tracker.
