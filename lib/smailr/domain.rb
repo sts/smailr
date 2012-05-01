@@ -4,16 +4,15 @@ module Smailr
             puts "Adding domain: #{fqdn}"
             Model::Domain.create(:fqdn => fqdn)
         end
-        
-        def self.rm(fqdn, options)
-            if options.force or
-                agree("WARNING: Remove domain #{fqdn} and all its mailboxes?")
+
+        def self.rm(fqdn, force = false)
+            if force or
+                agree("Do you want to remove the domain #{fqdn} and all related items? (yes/no) ")
 
                 domain = Model::Domain[:fqdn => fqdn]
-                domain.mailboxes_dataset.destroy
+                domain.rm_related
                 domain.destroy
             end
         end
-        
     end
 end

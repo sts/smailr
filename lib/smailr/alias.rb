@@ -1,29 +1,36 @@
 module Smailr
     module Alias
-        def self.add(address, options)
-            alias_fqdn = options.alias.split('@')[1]
+        def self.add(source, destinations)
+            srclocalpart, srcdomain = source.split('@')
 
             # We don't want aliases for non-local domains, since the
             # exim router won't accept it.
-            if not Model::Domain[:fqdn => alias_fqdn].exists?
-                say_error "You are trying to add an alias for a non-local domain: #{alias_fqdn}"
+            if not Model::Domain[:fqdn => srcdomain].exists?
+                say_error "You are trying to add an alias for a non-local domain: #{source}"
                 exit 1
             end
 
-            mbox = Model::Mailbox.for_address(address)
+            destinations.each do |dst|
+                dstlocalpart, dstdomain = dst.split('@')
 
-            # We don't want aliases which cannot be routed to a mailbox.
-            if not mbox.exists?
-                say_error "You are trying to add an alias for a non existing mailbox: #{address}"
-                exit 1
+                Model::Alias.find_or_create(:domain       => Model::Domain[:fqdn => srcdomain],
+                                            :localpart    => srclocalpart,
+                                            :dstdomain    => dstdomain,
+                                            :dstlocalpart => dstlocalpart)
             end
-
-            mbox.add_alias(:address => options.alias)
         end
 
-        def self.rm(address, options)
-            mbox = Model::Mailbox.for_address(address)
-            mbox.remove_alias(Model::Alias[:address => options.alias])
+        def self.rm(source, destinations)
+            srclocalpart, srcdomain = source.split('@')
+
+            destinations.each do |dst|
+                dstlocalpart, dstdomain = dst.split('@')
+
+                Model::Alias.filter(:domain       => Model::Domain[:fqdn => srcdomain],
+                                    :localpart    => srclocalpart,
+                                    :dstdomain    => dstdomain,
+                                    :dstlocalpart => dstlocalpart).delete
+            end
         end
     end
 end

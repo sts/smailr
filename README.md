@@ -74,11 +74,15 @@ List all addresses for a domain
 
 Simply add an 'user-alias@example.com' alias to the 'user@example.com' mailbox.
 
-    smailr add user@example.com --alias user-alias@example.com
+    smailr add user-alias@example.com --alias user@example.com
 
 To remove the alias again, run the rm command.
 
-    smailr rm user@example.com --alias user-alias@example.com
+    smailr rm user-alias@example.com --alias user@example.com
+
+You can as well specify multiple destinations for both commands separated by a comma:
+
+    smailr add user-alias@example.com --alias user@example.com,user1@example.com
 
 ### Mutt
 

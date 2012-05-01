@@ -4,7 +4,14 @@ module Smailr
     module Model
         class Domain < Sequel::Model
             one_to_many :mailboxes
-            many_to_one :dkim
+            one_to_many :aliases
+            one_to_many :dkims
+
+            def rm_related
+                self.remove_all_mailboxes
+                self.remove_all_aliases
+                self.remove_all_dkims
+            end
         end
 
         class Dkim < Sequel::Model
@@ -17,14 +24,25 @@ module Smailr
             def self.for_domain!(fqdn)
                 find_or_create(:domain => Domain[:fqdn => fqdn])
             end
-        end
+            one_to_many :aliases
+         end
 
         class Mailbox < Sequel::Model
             many_to_one :domain
-            one_to_many :aliases
 
             def password=(clear)
                 self[:password] = Digest::SHA1.hexdigest(clear)
+            end
+
+            def rm_related
+                self.aliases.destroy
+            end
+
+            def aliases
+                Model::Alias.where(
+                    :dstlocalpart => self.localpart,
+                    :dstdomain   => self.domain.fqdn
+                )
             end
 
             def self.domain(fqdn)
@@ -44,7 +62,7 @@ module Smailr
         end
 
         class Alias < Sequel::Model
-            many_to_one :mailbox
+            many_to_one :domain
         end
     end
 end

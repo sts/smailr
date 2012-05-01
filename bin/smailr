@@ -1,29 +1,50 @@
 #!/usr/bin/env ruby
-$: << File.join(File.dirname(__FILE__), ".." , "lib")
+$: << File.expand_path('../../lib', __FILE__)
 
 require 'smailr'
 
 DB = Sequel.connect("sqlite:///etc/exim4/smailr.sqlite")
 
 #
-# Helpers
+# CLI Helpers
 #
 def determine_object(string)
     return :domain  if string =~ /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i
     return :address if string =~ /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}$/i
 end
 
+def ask_password
+     min_password_length = 5
+     password = ask("Password: ") { |q| q.echo = "*" }
+     confirm  = ask("Confirm: ")  { |q| q.echo = "*" }
+
+    if password != confirm
+        say("Mismatch; try again.")
+        ask_password
+    end
+
+    if password.length < min_password_length
+        say("Too short; try again.")
+        ask_password
+    end
+
+    return password
+end
+
+program :version, Smailr::VERSION
+program :description, 'Simple MAIL mangaR - Virtual mail hosting management from the CLI'
+
 #
 # Commands
 #
 command :add do |c|
-    c.syntax = 'smailr add domain | mailbox [options]'
-    c.summary = 'Add a domain or addresses to the mail system.'
+    c.syntax = 'smailr add domain | mailbox | alias [options]'
+    c.summary = 'Add a new domain, mailbox or alias to the mail system.'
     c.example 'Add a domain',  'smailr add example.com'
-    c.example 'Add a mailbox', 'smailr add user@localdomain.com'
-    c.example 'Add an alias',  'smailr add user@localdomain.com --alias alias@localdomain.com'
+    c.example 'Add a mailbox', 'smailr add user@example.com'
+    c.example 'Add an alias',  'smailr add alias@localdom.com --alias user@example.com,user1@example.com'
     c.example 'Setup DKIM for a domain', 'smailr add ono.at --dkim'
-    c.option  '--alias STRING',    String,  'Specify an alias to create for a mailbox.'
+    c.option  '--alias STRING',    String,  'Specify the alias destination.'
     c.option  '--password STRING', String,  'The password for a new mailbox. If you omit this option, it prompts for one.'
     c.option  '--dkim',            String,  'Add a DKIM Key for a domain'
     c.action do |args, options|
@@ -39,8 +60,15 @@ command :add do |c|
                 end
 
             when :address
-                Smailr::Alias.add(address, options) if options.alias
-                Smailr::Mailbox.add(address, options) if not options.alias
+                if options.alias
+                    source       = args[0]
+                    destinations = options.alias.split(',')
+                    Smailr::Alias.add(source, destinations)
+                else
+                    options.password ||= ask_password
+                    Smailr::Mailbox.add(address, options.password)
+                end
+
         end
     end
 end
@@ -54,9 +82,9 @@ command :ls do |c|
                 domain = Smailr::Model::Domain[:fqdn => args[0]]
                 domain.mailboxes.each do |mbox|
                     puts "m: #{mbox.localpart}@#{args[0]}"
-                    mbox.aliases.each do |aalias|
-                        puts "a: #{aalias.address} > #{mbox.localpart}@#{args[0]}"
-                    end
+                end
+                domain.aliases.each do |aliass|
+                    puts "a: #{aliass.localpart}@#{args[0]} > #{aliass.dstlocalpart}@#{aliass.dstdomain}"
                 end
             when nil
                 domains = DB[:domains]
@@ -65,7 +93,7 @@ command :ls do |c|
                     puts d[:fqdn]
                 end
             else
-                error "You can either list a domains or an addresses."
+                error "You can either list a domains or a domains addresses."
                 exit 1
         end
     end
@@ -86,12 +114,18 @@ command :rm do |c|
                 if options.dkim
                     Smailr::Dkim.rm(address, options)
                 else
-                    Smailr::Domain.rm(address, options)
+                    Smailr::Domain.rm(address, options.force)
                 end
 
             when :address
-                Smailr::Alias.rm(address, options)   if options.alias
-                Smailr::Mailbox.rm(address, options) if not options.alias
+                if options.alias
+                    source       = args[0]
+                    destinations = options.alias.split(',')
+
+                    Smailr::Alias.rm(source, destinations)
+                else
+                    Smailr::Mailbox.rm(address, options)
+                end
         end
     end
 end
@@ -99,16 +133,16 @@ end
 
 command :migrate do |c|
     c.syntax  = 'smailr migrate [options]'
-    c.summary = 'Run database migrations'
+    c.summary = 'Create database and run migrations'
     c.option '--to VERSION', String, 'Migrate the database to a specifict version.'
     c.action do |args,options|
         require 'sequel/extensions/migration'
         raise "Database not configured" unless DB
 
         if options.version.nil?
-            Sequel::Migrator.apply(DB, 'migrations' )
+            Sequel::Migrator.apply(DB, Smailr.migrations_directory)
         else
-            Sequel::Migrator.apply(DB, 'migrations', :target => options.version.to_i)
+            Sequel::Migrator.apply(DB, Smailr.migrations_directory, :target => options.version.to_i)
         end
     end
 end

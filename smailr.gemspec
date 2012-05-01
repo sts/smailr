@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
+$: <<  File.expand_path('../lib', __FILE__)
+require 'smailr'
 
 Gem::Specification.new do |s|
     s.name              = 'smailr'
-    s.version           = '0.2.0'
+    s.version           = Smailr::VERSION
     s.date              = '2012-04-26'
     s.authors           = 'Stefan Schlesinger'
     s.email             = 'sts@ono.at'
@@ -12,7 +14,7 @@ Gem::Specification.new do |s|
                            from the shell. It currently uses SQLite as a backend.'
 
     s.has_rdoc          = false
-    s.files             = Dir.glob("{bin,lib,contrib}/**/*") 
+    s.files             = Dir.glob("{bin,lib,contrib,migrations}/**/*") 
 
     s.bindir            = 'bin'
     s.executables       << 'smailr'
