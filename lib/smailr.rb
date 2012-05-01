@@ -15,7 +15,7 @@ module Smailr
         attr_accessor :migrations_directory
     end
 
-    VERSION = '0.3.0'
+    VERSION = '0.4.0'
 end
 
 Smailr.contrib_directory    ||= File.expand_path('../../contrib', __FILE__)
