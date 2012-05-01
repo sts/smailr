@@ -77,6 +77,10 @@ List all addresses for a domain
 
     smailr ls example.com
 
+Update a users passowrd
+
+    smailr passwd user@example.com
+
 ### Aliases
 
 Simply add an 'user-alias@example.com' alias to the 'user@example.com' mailbox.

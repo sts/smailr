@@ -13,6 +13,12 @@ module Smailr
             mbox.save
         end
 
+        def self.update_password(address, password)
+            mbox = Model::Mailbox.for_address(address)
+            mbox.password = password
+            mbox.save
+        end
+
         def self.rm(address, options)
             mbox = Model::Mailbox.for_address(address)
             mbox.rm_related

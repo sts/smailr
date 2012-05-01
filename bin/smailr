@@ -130,6 +130,16 @@ command :rm do |c|
     end
 end
 
+command :passwd do |c|
+    c.syntax  = 'smailr passwd mailbox'
+    c.summary = 'Update a users password.'
+    c.action do |args,options|
+        address  = args[0]
+        password = ask_password
+        Smailr::Mailbox.update_password(address, password)
+    end
+end
+
 
 command :migrate do |c|
     c.syntax  = 'smailr migrate [options]'
