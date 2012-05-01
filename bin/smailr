@@ -167,9 +167,9 @@ command :mutt do |c|
     c.example       'Open test@example.com', 'smailr mutt test@example.com'
     c.action do |args,options|
         localpart, fqdn = args[0].split('@')
-        `command -v mutt >/dev/null 2>&1 || { echo "Please install mutt first. Aborting." >&2; exit 1; }`
-        if not $?
-            exec "MAIL=/srv/mail/users/#{fqdn}/#{localpart} MAILDIR=$MAIL mutt -mMaildir]"
+        mutt = `command -v mutt || { echo "Please install mutt first. Aborting." >&2; exit 1; }`
+        if $?
+            exec "MAIL=/srv/mail/users/#{fqdn}/#{localpart} MAILDIR=$MAIL #{mutt} -mMaildir"
         end
     end
 end
