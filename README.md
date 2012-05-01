@@ -10,6 +10,16 @@ Please note, Smailr is still in development!
 
 ## Installation
 
+Install Smailr
+
+    gem install smailr
+
+Add a user which will own the mails and is used for the LDA
+
+    useradd -r -d /srv/mail vmail
+    mkdir /srv/mail/users
+    chown -R vmail:vmail /srv/mail
+
 Install Exim and Dovecot
 
     aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
@@ -22,11 +32,8 @@ Install the example Exim and Dovecot configration files on your mailserver.
     invoke-rc.d exim4 restart
     invoke-rc.d dovecot restart
 
-Add a user which will own the mails and is used for the LDA
-
-    useradd -r -d /srv/mail vmail
-    mkdir /srv/mail/users
-    chown -R vmail:vmail /srv/mail
+**NOTE:** the contrib directory is located under /var/lib/gems/1.8/smailr-VERSION/contrib
+on Debian systems, there will be a nicer installation procedure for this soon.
 
 Run the setup command to initialize the smailr database
 
