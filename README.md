@@ -12,36 +12,47 @@ Please note, Smailr is still in development!
 
 Install Smailr
 
-    gem install smailr
+    # gem install smailr
 
 Add a user which will own the mails and is used for the LDA
 
-    useradd -r -d /srv/mail vmail
-    mkdir /srv/mail/users
-    chown -R vmail:vmail /srv/mail
+    # useradd -r -d /srv/mail vmail
+    # mkdir /srv/mail/users
+    # chown -R vmail:vmail /srv/mail
 
 Install Exim and Dovecot
 
-    aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
+    # aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
 
 Install the example Exim and Dovecot configration files on your mailserver.
 
-    cp contrib/exim4.conf /etc/exim4/exim4.conf
-    chown root:Debian-exim /etc/exim4/exim4.conf
-    cp contrib/dovecot* /etc/dovecot/
-    invoke-rc.d exim4 restart
-    invoke-rc.d dovecot restart
+    # smailr setup
+    *****************************************************************
+    All needed configuration files are in ./smailr-etc for review.
+    
+    Please install exim4, dovecot and then run the commands below, or
+    adjust the file locations according to your environment.
+    
+    Also make sure to configure a location for the SQLite database
+    file in samilr.yml.
+    
+    Then run 'smailr migrate' to initialize the database.
+    *****************************************************************
+    
+    cp smailr-etc/smailr.yml /etc/smailr.yml
+    cp smailr-etc/dovecot.conf /etc/dovecot/
+    cp smailr-etc/dovecot-sql.conf /etc/dovecot/
+    cp smailr-etc/exim4/
 
-**NOTE:** the contrib directory is located under /var/lib/gems/1.8/smailr-VERSION/contrib
-on Debian systems, there will be a nicer installation procedure for this soon.
+    # invoke-rc.d exim4 restart
+    # invoke-rc.d dovecot restart
 
-Run the setup command to initialize the smailr database
+Run the setup command to initialize the smailr database run:
 
-    # Creates /etc/exim4/smailr.sqlite
-    smailr migrate
+    # smailr migrate
 
-Add a domain and an user to your database using the commands listed below.
-
+You should now be ready to just manage your mailserver with the commands listed
+below.
 
 ## Managing your mailserver
 
@@ -94,6 +105,43 @@ To remove the alias again, run the rm command.
 You can as well specify multiple destinations for both commands separated by a comma:
 
     smailr add user-alias@example.com --alias user@example.com,user1@example.com
+
+### DKIM
+
+You can even manage RSA keys for Domain Key Identified Mail (DKIM).
+
+To create a new key for the selector MX do:
+
+    # smailr add example.com --dkim mx
+    public-key MIGJAo<snip>AAE= # returns the public key to use
+
+To remove the key again run:
+
+    smailr rm example.com --dkim mx
+
+**IMPORTANT NOTE**: You will need to setup DNS manually for DKIM to work. The
+above example requires the following DNS records:
+
+    $ORIGIN example.com
+       _domainkey     IN      TXT     "t=y\; o=~\;"
+    mx._domainkey     IN      TXT     "v=DKIM1\; t=y\; k=rsa\; p=MIGJAo<snip>AAE="
+
+Further explenation:
+
+    'mx'   matches up with your dkim_selector specified on you CLI.
+
+    't=y'  tells remote MTAs, that you are still testing DKIM.
+           Use t=n once everything works.
+
+    'o=~'  tells everybody, that only some may gets signed.
+           Use o=- if you want to sign everything.
+
+The exim configuration assumes a selector of 'mx' by default. You can change that, so
+it matches something else. Eg. the current month of the year, in case you want
+to generate a new key every month.
+
+Check the remote\_smtp transport configuration in the supplied Exim configuration file
+to change that.
 
 ### Mutt
 

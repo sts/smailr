@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 $: <<  File.expand_path('../lib', __FILE__)
+
 require 'smailr'
 
 Gem::Specification.new do |s|
@@ -14,7 +15,7 @@ Gem::Specification.new do |s|
                            from the shell. It currently uses SQLite as a backend.'
 
     s.has_rdoc          = false
-    s.files             = Dir.glob("{bin,lib,contrib,migrations}/**/*") 
+    s.files             = Dir.glob("{bin,lib,contrib,migrations}/**/*") + %w{README.md smailr.yml}
 
     s.bindir            = 'bin'
     s.executables       << 'smailr'

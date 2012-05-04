@@ -3,24 +3,26 @@ require 'openssl'
 
 module Smailr
     module Dkim
-        def self.add(fqdn, options)
-            options.testing ||= true
-
+        def self.add(fqdn, selector)
             if not Model::Domain[:fqdn => fqdn]
                 say_error "You trying to add a DKIM key for a non existing domain: #{fqdn}"
                 exit 1
             end
 
             private_key, public_key = generate_rsa_key
-            dkim = Model::Dkim.for_domain!(fqdn)
-            dkim.set(:private_key => private_key,
-                     :public_key  => public_key,
-                     :testing     => options.testing)
+
+            dkim = Model::Dkim.for_domain!(fqdn, selector)
+            dkim.private_key = private_key
+            dkim.public_key  = public_key
+            dkim.selector    = selector
             dkim.save
+
+            # Return the key so it can be used for automation
+            dkim.public_key
         end
 
-        def self.rm(fqdn, options)
-            dkim = Model::Dkim.for_domain(fqdn)
+        def self.rm(fqdn, selector)
+            dkim = Model::Dkim.for_domain(fqdn, selector)
             dkim.destroy
         end
 

@@ -5,8 +5,9 @@ Sequel.migration do
             foreign_key :domain_id
             String  :private_key, :required => true
             String  :public_key,  :required => true
-            String  :mode,        :required => true
-            Boolean :testing,     :required => true
+            String  :selector,    :required => true
+
+            index [:domain_id, :selector], :unique => true
         end
     end
 end

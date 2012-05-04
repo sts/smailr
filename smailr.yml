@@ -1,0 +1,9 @@
+---
+database:
+    adapter:  sqlite
+    database: /etc/exim4/smailr.sqlite
+    timeout: 5000
+
+password_policy:
+    length: 5
+

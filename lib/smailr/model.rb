@@ -17,14 +17,13 @@ module Smailr
         class Dkim < Sequel::Model
             many_to_one :domain
 
-            def self.for_domain(fqdn)
-                self[:domain => Domain[:fqdn => fqdn]]
+            def self.for_domain(fqdn, selector)
+                self[:domain => Domain[:fqdn => fqdn], :selector => selector]
             end
 
-            def self.for_domain!(fqdn)
-                find_or_create(:domain => Domain[:fqdn => fqdn])
+            def self.for_domain!(fqdn, selector)
+                find_or_create(:domain => Domain[:fqdn => fqdn], :selector => selector)
             end
-            one_to_many :aliases
          end
 
         class Mailbox < Sequel::Model
