@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Smailr by sts</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/sts/smailr">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/sts/smailr/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/sts/smailr/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Smailr</h1>
+          <p>Exim Virtual Mail Hosting Management CLI</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/sts">sts</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Smailr - Virtual Mail Hosting Management CLI</h1>
+
+<p>Smailr is a small CLI application, which lets you manage a typical mail stack. Smailr is simple, its small and its fast. It uses Sqlite for its underlaying database and comes with example configurations for Exim and Dovecot.</p>
+
+<blockquote>
+<p>Please note, Smailr is still in development! And I still didn't figure out on how to do database upgrades.</p>
+</blockquote>
+
+<h2>Installation</h2>
+
+<p>Install Smailr</p>
+
+<pre><code># gem install smailr
+</code></pre>
+
+<p>Add a user which will own the mails and is used for the LDA</p>
+
+<pre><code># useradd -r -d /srv/mail vmail
+# mkdir /srv/mail/users
+# chown -R vmail:vmail /srv/mail
+</code></pre>
+
+<p>Install Exim and Dovecot</p>
+
+<pre><code># aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
+</code></pre>
+
+<p>Install the example Exim and Dovecot configration files on your mailserver.</p>
+
+<pre><code># smailr setup
+*****************************************************************
+All needed configuration files are in ./smailr-etc for review.
+
+Please install exim4, dovecot and then run the commands below, or
+adjust the file locations according to your environment.
+
+Also make sure to configure a location for the SQLite database
+file in samilr.yml.
+
+Then run 'smailr migrate' to initialize the database.
+*****************************************************************
+
+cp smailr-etc/smailr.yml /etc/smailr.yml
+cp smailr-etc/dovecot.conf /etc/dovecot/
+cp smailr-etc/dovecot-sql.conf /etc/dovecot/
+cp smailr-etc/exim4/
+
+# invoke-rc.d exim4 restart
+# invoke-rc.d dovecot restart
+</code></pre>
+
+<p>Run the setup command to initialize the smailr database run:</p>
+
+<pre><code># smailr migrate
+</code></pre>
+
+<p>You should now be ready to just manage your mailserver with the commands listed
+below.</p>
+
+<h2>Managing your mailserver</h2>
+
+<h3>Domains</h3>
+
+<p>Add a local domain</p>
+
+<pre><code>smailr add example.com
+</code></pre>
+
+<p>Remove a local domain and all associated mailboxes</p>
+
+<pre><code>smailr rm example.com
+</code></pre>
+
+<p>List all domains</p>
+
+<pre><code>smailr ls
+</code></pre>
+
+<h3>Mailboxes</h3>
+
+<p>Add a new local mailbox. This will interactively ask you for the user password</p>
+
+<pre><code>smailr add user@example.com
+</code></pre>
+
+<p>You can as well specify the password on the CLI</p>
+
+<pre><code>smailr add user@example.com --password secretpass
+</code></pre>
+
+<p>Remove a local mailbox</p>
+
+<pre><code>smailr rm user@example.com
+</code></pre>
+
+<p>List all addresses for a domain</p>
+
+<pre><code>smailr ls example.com
+</code></pre>
+
+<p>Update a users passowrd</p>
+
+<pre><code>smailr passwd user@example.com
+</code></pre>
+
+<h3>Aliases</h3>
+
+<p>Simply add an '<a href="mailto:user-alias@example.com">user-alias@example.com</a>' alias to the '<a href="mailto:user@example.com">user@example.com</a>' mailbox.</p>
+
+<pre><code>smailr add user-alias@example.com --alias user@example.com
+</code></pre>
+
+<p>To remove the alias again, run the rm command.</p>
+
+<pre><code>smailr rm user-alias@example.com --alias user@example.com
+</code></pre>
+
+<p>You can as well specify multiple destinations for both commands separated by a comma:</p>
+
+<pre><code>smailr add user-alias@example.com --alias user@example.com,user1@example.com
+</code></pre>
+
+<h3>DKIM</h3>
+
+<p>You can even manage RSA keys for Domain Key Identified Mail (DKIM).</p>
+
+<p>To create a new key for the selector MX do:</p>
+
+<pre><code># smailr add example.com --dkim mx
+public-key MIGJAo&lt;snip&gt;AAE= # returns the public key to use
+</code></pre>
+
+<p>To remove the key again run:</p>
+
+<pre><code>smailr rm example.com --dkim mx
+</code></pre>
+
+<p><strong>IMPORTANT NOTE</strong>: You will need to setup DNS manually for DKIM to work. The
+above example requires the following DNS records:</p>
+
+<pre><code>$ORIGIN example.com
+   _domainkey     IN      TXT     "t=y\; o=~\;"
+mx._domainkey     IN      TXT     "v=DKIM1\; t=y\; k=rsa\; p=MIGJAo&lt;snip&gt;AAE="
+</code></pre>
+
+<p>Further explenation:</p>
+
+<pre><code>'mx'   matches up with your dkim_selector specified on you CLI.
+
+'t=y'  tells remote MTAs, that you are still testing DKIM.
+       Use t=n once everything works.
+
+'o=~'  tells everybody, that only some may gets signed.
+       Use o=- if you want to sign everything.
+</code></pre>
+
+<p>The exim configuration assumes a selector of 'mx' by default. You can change that, so
+it matches something else. Eg. the current month of the year, in case you want
+to generate a new key every month.</p>
+
+<p>Check the remote_smtp transport configuration in the supplied Exim configuration file
+to change that.</p>
+
+<h3>Mutt</h3>
+
+<p>Smailr can launch mutt with the required configuration for a specific mailbox
+automatically. Open mutt for the specified mailbox:</p>
+
+<pre><code>smailr mutt user@example.com
+</code></pre>
+
+<h2>Compatibility</h2>
+
+<p>Smailr was developed an tested on Debian/Squeeze and should be easily portable
+to any other system.</p>
+
+<h2>BUGS</h2>
+
+<p>For bugs or feature requests, please use the GitHub issue tracker.</p>
+
+<p><a href="https://github.com/sts/smailr/issues">https://github.com/sts/smailr/issues</a></p>
+
+<h2>WHO</h2>
+
+<p>Stefan Schlesinger / <a href="mailto:sts@ono.at">sts@ono.at</a> / @stsonoat / <a href="http://sts.ono.at">http://sts.ono.at</a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-31443839-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
