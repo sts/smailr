@@ -47,6 +47,12 @@ module Smailr
             FileUtils.cp File.expand_path("../smailr.yml", prefix), "/etc/smailr.yml"
             say "Configuration installed in /etc/smailr.yml. Please revise, then run 'smailr setup' again."
         else
+            # ALWAYS WARN HERE
+            if not agree("**** WARNING ****   Script will overwrite Exim and Dovecot configuration files in /etc? (yes/no) ")
+                say "**** ABORTED ****   You can find all example configs in: #{prefix}"
+                exit 1
+            end
+
             # Only install configuration if needed
             if config["exim_path"]
                 if File.writable?(config["exim_path"])
