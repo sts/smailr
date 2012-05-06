@@ -32,9 +32,15 @@ Gem::Specification.new do |s|
 
 SMAILR /////////////////////////////////////////////////////////////////
 
-   To finish the installation copy the example Exim and Dovecot
-   configuration files from the contrib directory and run
-   'smailr migrate' to initialize the database.
+ TO FINISH THE LOCAL SMAILR INSTALLATION RUN:
+ 
+  * 'smailr setup' once, to create /etc/smailr.yml
+
+  * Review the configuration file please
+
+  * 'smailr stetup' again, to initialize all configurations
+
+  * 'smailr migrate' to initialize the database
 
 //////////////////////////////////////////////////////////////// ///////
 
