@@ -6,7 +6,7 @@ require 'commander/import'
 require 'fileutils'
 
 module Smailr
-    VERSION = '0.5.1'
+    VERSION = '0.5.2'
 
     autoload :Model,   'smailr/model'
     autoload :Domain,  'smailr/domain'
@@ -50,7 +50,7 @@ module Smailr
             # Only install configuration if needed
             if config["exim_path"]
                 if File.writable?(config["exim_path"])
-                    FileUtils.cp File.expand_path("/exim4.conf", prefix), config["exim_path"]
+                    FileUtils.cp File.expand_path("exim4.conf", prefix), config["exim_path"]
                 else
                     say_error "Cannot copy Exim configuration to #{config["exim_path"]} - permission denied or path doesn't exist."
                     exit 1
@@ -59,8 +59,8 @@ module Smailr
 
             if config["dovecot_path"]
                 if File.writable?(config["dovecot_path"])
-                    FileUtils.cp File.expand_path("/dovecot.conf", prefix),     config["dovecot_path"]
-                    FileUtils.cp File.expand_path("/dovecot-sql.conf", prefix), config["dovecot_path"]
+                    FileUtils.cp File.expand_path("dovecot.conf", prefix),     config["dovecot_path"]
+                    FileUtils.cp File.expand_path("dovecot-sql.conf", prefix), config["dovecot_path"]
                 else
                     say_error "Cannot copy Dovecot configuration to #{config["dovecot_path"]} - permission denied or path doesn't exist."
                     exit 1
