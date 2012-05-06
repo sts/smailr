@@ -6,7 +6,7 @@ require 'commander/import'
 require 'fileutils'
 
 module Smailr
-    VERSION = '0.5.0'
+    VERSION = '0.5.1'
 
     autoload :Model,   'smailr/model'
     autoload :Domain,  'smailr/domain'
@@ -39,38 +39,40 @@ module Smailr
     def self.setup
         prefix = self.contrib_directory
 
-        FileUtils.mkdir_p "smailr-etc/exim4"
-        FileUtils.mkdir_p "smailr-etc/dovecot"
+        if not File.exists?("/etc/smailr.yml")
+            if not File.writable?("/etc")
+               say_error "Cannot copy configuration to /etc/smailr.yml - permission denied."
+               exit 1
+            end
+            FileUtils.cp File.expand_path("../smailr.yml", prefix), "/etc/smailr.yml"
+            say "Configuration installed in /etc/smailr.yml. Please revise, then run 'smailr setup' again."
+        else
+            # Only install configuration if needed
+            if config["exim_path"]
+                if File.writable?(config["exim_path"])
+                    FileUtils.cp File.expand_path("/exim4.conf", prefix), config["exim_path"]
+                else
+                    say_error "Cannot copy Exim configuration to #{config["exim_path"]} - permission denied or path doesn't exist."
+                    exit 1
+                end
+            end
 
-        FileUtils.cp File.expand_path("../README.md", prefix),    "smailr-etc/"
-        FileUtils.cp File.expand_path("../smailr.yml", prefix),   "smailr-etc/"
-        FileUtils.cp File.expand_path("exim4.conf", prefix),      "smailr-etc/exim4"
-        FileUtils.cp File.expand_path("dovecot.conf", prefix),    "smailr-etc/dovecot"
-        FileUtils.cp File.expand_path("dovecot-sql.conf", prefix),"smailr-etc/dovecot"
+            if config["dovecot_path"]
+                if File.writable?(config["dovecot_path"])
+                    FileUtils.cp File.expand_path("/dovecot.conf", prefix),     config["dovecot_path"]
+                    FileUtils.cp File.expand_path("/dovecot-sql.conf", prefix), config["dovecot_path"]
+                else
+                    say_error "Cannot copy Dovecot configuration to #{config["dovecot_path"]} - permission denied or path doesn't exist."
+                    exit 1
+                end
+            end
 
-        say "*****************************************************************"
-        say "All needed configuration files are in ./smailr-etc for review."
-        say "\n"
-        say "Please install exim4, dovecot and then run the commands below, or"
-        say "adjust the file locations according to your environment."
-        say "\n"
-        say "Also make sure to configure a location for the SQLite database"
-        say "file in smailr.yml."
-        say "\n"
-        say "Then run 'smailr migrate' to initialize the database."
-        say "*****************************************************************"
-        say "\n"
-        say "cp smailr-etc/smailr.yml /etc/smailr.yml"
-        say "cp smailr-etc/dovecot.conf /etc/dovecot/"
-        say "cp smailr-etc/dovecot-sql.conf /etc/dovecot/"
-        say "cp smailr-etc/exim4/"
-
-        # Future version could maybe launch puppet here?
-        #
-        #instalpp = File.expand_path('/install.pp', self.contrib_directory)
-        #if agree("Shall we launch puppet with the manifest from #{installpp}? (yes/no) ")
-        #    exec "puppet apply #{installpp}"
-        #end
+            if config["mail_spool_path"]
+                exec "useradd -r -d #{config["mail_spool_path"]} vmail"
+                FileUtils.mkdir_p "#{config["mail_spool_path"]}/users"
+                FileUtils.chown "vmail", "vmail", config["mail_spool_path"]
+            end
+        end
     end
 end
 

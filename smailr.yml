@@ -1,4 +1,8 @@
 ---
+exim_path:       /etc/exim4
+dovecot_path:    /etc/dovecot
+mail_spool_path: /srv/mail
+
 database:
     adapter:  sqlite
     database: /etc/exim4/smailr.sqlite

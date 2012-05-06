@@ -10,44 +10,25 @@ Please note, Smailr is still in development!
 
 ## Installation
 
-Install Smailr
+Install Packages
+
+    # aptitude install exim4-daemon-heavy dovecot-imapd dovecot-pop3d
+
+    # aptitude install rubygems libsqlite3-dev
+
+Install Smailr Gem package
 
     # gem install smailr
 
-Add a user which will own the mails and is used for the LDA
-
-    # useradd -r -d /srv/mail vmail
-    # mkdir /srv/mail/users
-    # chown -R vmail:vmail /srv/mail
-
-Install Exim and Dovecot
-
-    # aptitude install exim-daemon-heavy dovecot-imapd dovecot-pop3d
-
-Install the example Exim and Dovecot configration files on your mailserver.
+Generate the Smailr configuration in /etc/smailr.yml
 
     # smailr setup
-    *****************************************************************
-    All needed configuration files are in ./smailr-etc for review.
-    
-    Please install exim4, dovecot and then run the commands below, or
-    adjust the file locations according to your environment.
-    
-    Also make sure to configure a location for the SQLite database
-    file in samilr.yml.
-    
-    Then run 'smailr migrate' to initialize the database.
-    *****************************************************************
-    
-    cp smailr-etc/smailr.yml /etc/smailr.yml
-    cp smailr-etc/dovecot.conf /etc/dovecot/
-    cp smailr-etc/dovecot-sql.conf /etc/dovecot/
-    cp smailr-etc/exim4/
 
-    # invoke-rc.d exim4 restart
-    # invoke-rc.d dovecot restart
+please review the configuration file, then run 'setup' again:
 
-Run the setup command to initialize the smailr database run:
+    # smailr setup
+
+To initialize the database run all migrations
 
     # smailr migrate
 
