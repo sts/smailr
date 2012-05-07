@@ -147,9 +147,9 @@ end
 
 command :setup do |c|
     c.syntax  = 'smailr setup'
-    c.summary = 'Install a required components on a mailserver'
+    c.summary = 'Install all required components on a mailserver'
     c.action do |args,options|
-        Smailr::setup
+        Smailr::Setup.run
     end
 end
 

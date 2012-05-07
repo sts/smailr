@@ -1,7 +1,11 @@
 ---
-exim_path:       /etc/exim4
-dovecot_path:    /etc/dovecot
-mail_spool_path: /srv/mail
+# Smailr Configuration
+#
+# These are defaults, which work quite well for Debian based systems.
+#
+# In case you are runnnig smailr on a different platform, please
+# adjust the settings to your needs.
+#
 
 database:
     adapter:  sqlite
@@ -10,4 +14,17 @@ database:
 
 password_policy:
     length: 5
+
+# Exim
+exim_path:       /etc/exim4
+exim_user:       Debian-exim
+exim_group:      Debian-exim
+
+# Dovecot
+dovecot_path:    /etc/dovecot
+
+# Mailspool
+mail_spool_path: /srv/mail
+mail_spool_user: vmail
+
 
