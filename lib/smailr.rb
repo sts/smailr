@@ -6,7 +6,7 @@ require 'commander/import'
 require 'fileutils'
 
 module Smailr
-    VERSION = '0.5.3'
+    VERSION = '0.5.4'
 
     autoload :Model,   'smailr/model'
     autoload :Domain,  'smailr/domain'

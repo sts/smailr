@@ -6,7 +6,7 @@ require 'smailr'
 Gem::Specification.new do |s|
     s.name              = 'smailr'
     s.version           = Smailr::VERSION
-    s.date              = '2012-04-26'
+    s.date              = '2012-12-10'
     s.authors           = 'Stefan Schlesinger'
     s.email             = 'sts@ono.at'
     s.homepage          = 'http://github.com/sts/smailr'
@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
     s.executables       << 'smailr'
 
     s.add_dependency    'commander'
-    s.add_dependency    'sqlite3'
     s.add_dependency    'sequel'
 
     s.requirements      << 'Exim'
@@ -32,15 +31,19 @@ Gem::Specification.new do |s|
 
 SMAILR /////////////////////////////////////////////////////////////////
 
- TO FINISH THE LOCAL SMAILR INSTALLATION RUN:
- 
-  * 'smailr setup' once, to create /etc/smailr.yml
+ TO FINISH THE LOCAL SMAILR INSTALLATION:
 
-  * Review the configuration file please
+  * Install Exim with SQLite support
 
-  * 'smailr stetup' again, to initialize all configurations
+  * Install Dovecot with SQlite support
 
-  * 'smailr migrate' to initialize the database
+  * On Debian run: export PATH="/var/lib/gems/1.8/bin:${PATH}"
+
+  * 'smailr setup' to create exim, dovecot and smailr configuration (you
+    can edit the configuration in an editor window before everyting is
+    initialized)
+
+  * 'smailr migrate' to initialize the database file
 
 //////////////////////////////////////////////////////////////// ///////
 
