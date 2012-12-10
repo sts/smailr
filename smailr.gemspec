@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
     s.requirements      << 'Dovecot'
     s.requirements      << 'Debian'
 
-    s.post_install_message = "
+    s.post_install_message = '
 
 SMAILR /////////////////////////////////////////////////////////////////
 
@@ -37,16 +37,16 @@ SMAILR /////////////////////////////////////////////////////////////////
 
   * Install Dovecot with SQlite support
 
-  * On Debian run: export PATH="/var/lib/gems/1.8/bin:\$\{PATH\}"
+  * run export PATH="/var/lib/gems/1.8/bin:${PATH}"
 
-  * 'smailr setup' to create exim, dovecot and smailr configuration (you
+  * run "smailr setup" to create exim, dovecot and smailr configuration (you
     can edit the configuration in an editor window before everyting is
     initialized)
 
-  * 'smailr migrate' to initialize the database file
+  * run "smailr migrate" to initialize the database file
 
 //////////////////////////////////////////////////////////////// ///////
 
-"
+'
 
 end
