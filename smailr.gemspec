@@ -37,7 +37,7 @@ SMAILR /////////////////////////////////////////////////////////////////
 
   * Install Dovecot with SQlite support
 
-  * On Debian run: export PATH="/var/lib/gems/1.8/bin:${PATH}"
+  * On Debian run: export PATH="/var/lib/gems/1.8/bin:\$\{PATH\}"
 
   * 'smailr setup' to create exim, dovecot and smailr configuration (you
     can edit the configuration in an editor window before everyting is
