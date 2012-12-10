@@ -1,12 +1,30 @@
 module Smailr
     module Setup
         def self.run
+
+            if Process.euid != 0
+                say "ERROR: YOU ARE NOT RUNNING THIS SCRIPT WITH ROOT PRIVILEGES, EXITING."
+                exit
+            end
+
             # This is still hardcoded, required too much brainfuck to deal
             # with mulitple possible configuration files locations ATM.
             if File.exists?("/etc/smailr.yml")
+                say "SYSTEM UPGRADE"
                 say "---------------------------------------------------------------------------"
-                say "Detected an existing smailr configuration on your system in /etc/smailr.yml"
-                if agree "Do you want to load the defaults from there, install a new one, or abort?"
+                say "You appear to already have a copy of smailr installed. Are you sure you want"
+                say "proceed with the setup routine?"
+                say ""
+                say "This script is going to replace exim and dovecot configuration files"
+                say "from /etc ; Backups of the existing config files will be created!"
+                say ""
+                say "FILES TO BE WRITTEN:"
+                say ""
+                say " - %s" % File.expand_path("exim4.conf", Smailr.config["exim_path"])
+                say " - %s" % File.expand_path("dovecot.conf", Smailr.config["dovecot_path"])
+                say " - %s" % File.expand_path("dovecot-sql.conf", Smailr.config["dovecot_path"])
+                say ""
+                if agree "Continue? [yes/no]"
                     defaults_file = "/etc/smailr.yml"
                 else
                     exit
@@ -89,7 +107,10 @@ module Smailr
         end
 
         def self.setup_mail_spool
-            exec "useradd -r -d #{Smailr.config["mail_spool_path"]} vmail"
+            unless Etc.getpwnam("vmail")
+                exec "useradd -r -d #{Smailr.config["mail_spool_path"]} vmail"
+            end
+
             FileUtils.mkdir_p "#{Smailr.config["mail_spool_path"]}/users"
             FileUtils.chown "vmail", "vmail", Smailr.config["mail_spool_path"]
         end
