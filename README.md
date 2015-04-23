@@ -14,7 +14,7 @@ Install Packages
 
     # aptitude install exim4-daemon-heavy dovecot-imapd dovecot-pop3d
 
-    # aptitude install rubygems libsqlite3-dev
+    # aptitude install rubygems libsqlite3-dev ruby-sqlite3
 
 Install Smailr Gem package
 
