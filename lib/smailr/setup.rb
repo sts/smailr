@@ -144,7 +144,7 @@ module Smailr
                     end
 
                     # MODE
-                    FileUtils.chmod opts[:mode].to_i, file  if opts[:mode]
+                    FileUtils.chmod opts[:mode], file  if opts[:mode]
 
                     # USER
                     FileUtils.chown opts[:owner], nil, file if opts[:owner]
