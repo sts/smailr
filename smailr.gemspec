@@ -6,7 +6,7 @@ require 'smailr'
 Gem::Specification.new do |s|
     s.name              = 'smailr'
     s.version           = Smailr::VERSION
-    s.date              = '2012-12-10'
+    s.date              = '2015-04-23'
     s.authors           = 'Stefan Schlesinger'
     s.email             = 'sts@ono.at'
     s.homepage          = 'http://github.com/sts/smailr'
