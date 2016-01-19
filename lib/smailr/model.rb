@@ -31,6 +31,7 @@ module Smailr
 
             def password=(clear)
                 self[:password] = Digest::SHA1.hexdigest(clear)
+                self[:password_scheme] = "{SHA}"
             end
 
             def rm_related
