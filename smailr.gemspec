@@ -6,13 +6,13 @@ require 'smailr'
 Gem::Specification.new do |s|
     s.name              = 'smailr'
     s.version           = Smailr::VERSION
-    s.date              = '2015-04-23'
+    s.date              = '2016-01-19'
     s.authors           = 'Stefan Schlesinger'
     s.email             = 'sts@ono.at'
     s.homepage          = 'http://github.com/sts/smailr'
     s.summary           = 'Simple MAIL manageR - Virtual mail hosting management from the CLI'
-    s.description       = 'Smailr is a CLI tool which lets you manage your Exim/Dovecot setup
-                           from the shell. It currently uses SQLite as a backend.'
+    s.description       = 'Smailr is a CLI tool which lets you manage your virtual mailhosting setup
+                           from the shell. It currently uses SQLite as a backend, samples for Dovecot/Exim provided.'
 
     s.has_rdoc          = false
     s.files             = Dir.glob("{bin,lib,contrib,migrations}/**/*") + %w{README.md smailr.yml}

@@ -1,12 +1,10 @@
-# Smailr - A Virtual Mail Hosting Management CLI (ALPHA)
+# Smailr - A Virtual Mail Hosting Management CLI
 
 Smailr is a small CLI application, which lets you manage the database for a
-typical Exim/Dovecot stack.
+typical mailserver (examples provided for Exim/Dovecot).
 
 Configuration files are provided within the contrib directory, so you should be
 able to get everything up and running within a couple of minutes.
-
-Please note, Smailr is still in development!
 
 ## Installation
 
