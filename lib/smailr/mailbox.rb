@@ -1,6 +1,8 @@
 module Smailr
     module Mailbox
         def self.add(address, password)
+            puts "Adding mailbox: #{address}"
+
             fqdn = address.split('@')[1]
 
             if not Model::Domain[:fqdn => fqdn]
@@ -20,6 +22,8 @@ module Smailr
         end
 
         def self.rm(address, options)
+            puts "Removing mailbox (from database): #{address}"
+
             mbox = Model::Mailbox.for_address(address)
             mbox.rm_related
             mbox.destroy

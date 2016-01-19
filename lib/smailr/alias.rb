@@ -13,6 +13,8 @@ module Smailr
             destinations.each do |dst|
                 dstlocalpart, dstdomain = dst.split('@')
 
+                puts "Adding alias: #{source} -> #{dst}"
+
                 Model::Alias.find_or_create(:domain       => Model::Domain[:fqdn => srcdomain],
                                             :localpart    => srclocalpart,
                                             :dstdomain    => dstdomain,
@@ -24,6 +26,8 @@ module Smailr
             srclocalpart, srcdomain = source.split('@')
 
             destinations.each do |dst|
+                puts "Removing alias: #{source} -> #{dst}"
+
                 dstlocalpart, dstdomain = dst.split('@')
 
                 Model::Alias.filter(:domain       => Model::Domain[:fqdn => srcdomain],
