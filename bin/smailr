@@ -201,3 +201,41 @@ command :mutt do |c|
         end
     end
 end
+
+command :verify do |c|
+    c.syntax      = "smailr verify address"
+    c.summary     = "Send out a test message to verify a domains configuration via verifier.port25.com"
+    c.description = "A reply email will be sent back to you with an analysis of the message’s authentication" +
+                    "status.  The report will perform the following checks: SPF, SenderID, DomainKeys, DKIM " +
+                    "and Spamassassin.\n\n"
+    c.example       'Verify test@example.com (report will be sent to test@example.com)', 'smailr verify test@example.com'
+    c.example       'Verify test@example.com, send report to root@example.com', 'smailr verify test@example.com --report-to root@example.com'
+
+    c.option        '-r DESTINATION', '--report-to DESTINATION', String, 'Send the report to the specified address instead.'
+
+    c.action do |args,options|
+        from = args[0]
+        options.default :report_to => from
+
+        dstlocalpart, dstfqdn = options.report_to.split('@')
+
+        require 'socket'
+        require 'date'
+        require 'net/smtp'
+        Net::SMTP.start('localhost', 25) do |smtp|
+            to = "check-auth-#{dstlocalpart}=#{dstfqdn}@verifier.port25.com"
+
+            message = [
+                "From: #{from}",
+                "To: #{to}",
+                "Subject: Port25 Mail Verification Test",
+                "Date: #{DateTime.now.strftime("%a, %d %b %Y %H:%M:%S %z")}",
+                "",
+                "This is a test message for the port25 mail verification test, it was",
+                "sent from the following server: #{Socket.gethostname}."
+            ].join("\r\n")
+
+            smtp.send_message(message, from, to)
+        end
+    end
+end
