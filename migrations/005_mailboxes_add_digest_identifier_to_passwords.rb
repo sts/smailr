@@ -13,11 +13,13 @@ Sequel.migration do
 
         MESSAGE
 
-        add_column(:password_scheme, String)
+        add_column :mailboxes, :password_scheme, String
 
         from(:mailboxes).update(password_scheme: "{SHA}")
 
-        set_column_not_null(:password_scheme)
+        alter_table(:mailboxes) do
+            set_column_not_null(:password_scheme)
+        end
     end
 
     # Downgrade is not supported, as we would drop necessary information do do effective hashing
