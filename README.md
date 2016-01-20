@@ -33,6 +33,31 @@ To initialize the database run all migrations
 You should now be ready to just manage your mailserver with the commands listed
 below.
 
+## Configuration
+
+Smailr is configured in /etc/smailr.yml, thats where you can configure your
+database backend. By default smailr will use the following sqlite datbase:
+
+    database:
+        adapter:  sqlite
+        database: /etc/exim4/smailr.sqlite
+
+The configuration files in the contrib directory are configured to work with
+this database.
+
+But you can configure any other database as well. Eg. for MySQL use:
+
+    database:
+        adapter: mysql2
+        host: localhost
+        username: smailr
+        database: smailr
+        password: S3cr3t
+
+Just make sure the database driver is installed (for MySQL: aptitude install
+ruby-mysql2). Smailr uses the Sequel ORM, check out the following page for
+connection parameters: [sequel.jeremyevans.net/opening_databases_rdoc](http://sequel.jeremyevans.net/rdoc/files/doc/opening_databases_rdoc.html)
+
 ## Managing your mailserver
 
 ### Domains
@@ -128,6 +153,23 @@ Smailr can launch mutt with the required configuration for a specific mailbox
 automatically. Open mutt for the specified mailbox:
 
     smailr mutt user@example.com
+
+### Verify
+
+Smailr generates a report via the Port25 SMTP Verifier. It generates a test,
+sends it to  check-auth-user=eaxmple.comt@verifier.port25.com, which will in
+return generate a echo message with a report about a results from many SMTP
+combonents: SPF, SenderID, DomainKeys, DKIM and Spamassassin.
+
+To generate a message, sent from user@example.com and return the report to the
+same address simply call the following command:
+
+    smailr verify user@example.com
+
+In case you want to generate the report for user@example.com, but receive it at
+a different location add the report-to option:
+
+    smailr verify user@example.com --report-to postmaster@ono.at
 
 ## Compatibility
 
