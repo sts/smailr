@@ -157,9 +157,9 @@ automatically. Open mutt for the specified mailbox:
 ### Verify
 
 Smailr generates a report via the Port25 SMTP Verifier. It generates a test,
-sends it to  check-auth-user=eaxmple.comt@verifier.port25.com, which will in
-return generate a echo message with a report about a results from many SMTP
-combonents: SPF, SenderID, DomainKeys, DKIM and Spamassassin.
+sends it to check-auth-user=eaxmple.comt@verifier.port25.com, which will in
+return generate a echo message with a report about results of many SMTP
+components: SPF, SenderID, DomainKeys, DKIM and Spamassassin.
 
 To generate a message, sent from user@example.com and return the report to the
 same address simply call the following command:

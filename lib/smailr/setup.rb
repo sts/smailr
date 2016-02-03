@@ -1,6 +1,10 @@
+require 'commander'
+
 module Smailr
-    module Setup
-        def self.run
+    class Setup
+        include Commander::Methods
+
+        def run
 
             if Process.euid != 0
                 say "ERROR: YOU ARE NOT RUNNING THIS SCRIPT WITH ROOT PRIVILEGES, EXITING."

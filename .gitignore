@@ -1,0 +1,6 @@
+.bundle
+bin
+!bin/smailr
+*.gem
+*.sqlite
+Gemfile.lock
