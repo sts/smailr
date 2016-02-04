@@ -1,5 +1,11 @@
 require 'commander'
 
+class String
+  def unindent
+    gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, "")
+  end
+end
+
 module Smailr
   class Cli
 
@@ -52,7 +58,7 @@ module Smailr
         c.example 'Add a domain',  'smailr add example.com'
         c.example 'Add a mailbox', 'smailr add user@example.com'
         c.example 'Add an alias',  'smailr add alias@localdom.com --alias user@example.com,user1@example.com'
-        c.example 'Setup DKIM for a domain', 'smailr add ono.at --dkim'
+        c.example 'Setup DKIM for a domain', 'smailr add ono.at --dkim mail'
         c.option  '--alias DESTINATION', String, 'Specify the alias destination.'
         c.option  '--password PASSWORD', String, 'The password for a new mailbox. If you omit this option, it prompts for one.'
         c.option  '--dkim SELECTOR',     String, 'Add a DKIM Key with the specified selector for domain.'
@@ -65,8 +71,16 @@ module Smailr
               if options.dkim
                 selector = options.dkim
                 key = Smailr::Dkim.add(address, selector)
+                key_fmt = key.split("\n").slice(1..-2).join
 
-                puts "public-key " + key.split("\n").slice(1..-2).join
+                puts <<-EOM.unindent
+                .
+                  DKIM is active now, please setup domainkey records in zone #{address}:
+
+                          _domainkey IN TXT "t=y\; o=~\;"
+                  #{selector}._domainkey IN TXT "v=DKIM1\; t=y\; k=rsa\; p=#{key_fmt}
+                .
+                EOM
               else
                 Smailr::Domain.add(address)
               end
