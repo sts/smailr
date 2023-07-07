@@ -1,4 +1,4 @@
-require 'digest/sha1'
+require 'bcrypt'
 
 module Smailr
   module Model
@@ -30,8 +30,14 @@ module Smailr
       many_to_one :domain
 
       def password=(clear)
-        self[:password_scheme] = '{SHA}'
-        self[:password] = Digest::SHA1.hexdigest(clear)
+        crypted = BCrypt::Password.create(
+          clear,
+          cost: BCrypt::Engine::DEFAULT_COST,
+          salt: BCrypt::Engine.generate_salt
+        )
+
+        self[:password_scheme] = '{BLF-CRYPT}'
+        self[:password] = crypted
       end
 
       def rm_related

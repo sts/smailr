@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
     s.executables       << 'smailr'
     s.add_runtime_dependency 'commander', '~> 4.3'
     s.add_runtime_dependency 'sequel', '~> 4.26'
+    s.add_runtime_dependency 'bcrypt', '~> 3.1'
 
     s.requirements      << 'Exim'
     s.requirements      << 'Dovecot'
