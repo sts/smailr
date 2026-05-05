@@ -10,9 +10,10 @@ able to get everything up and running within a couple of minutes.
 
 Install Packages
 
-    # aptitude install exim4-daemon-heavy dovecot-imapd dovecot-pop3d
+    # apt install exim4-daemon-heavy dovecot-imapd dovecot-pop3d
 
-    # aptitude install rubygems libsqlite3-dev ruby-sqlite3
+    # apt install ruby-rubygems ruby-bcrypt ruby-sqlite3
+    # apt install ruby-rubygems ruby-bcrypt ruby-mysql2
 
 Install Smailr Gem package
 
@@ -54,7 +55,7 @@ But you can configure any other database as well. Eg. for MySQL use:
         database: smailr
         password: S3cr3t
 
-Just make sure the database driver is installed (for MySQL: aptitude install
+Just make sure the database driver is installed (for MySQL: apt install
 ruby-mysql2). Smailr uses the Sequel ORM, check out the following page for
 connection parameters: [sequel.jeremyevans.net/opening_databases_rdoc](http://sequel.jeremyevans.net/rdoc/files/doc/opening_databases_rdoc.html)
 
@@ -186,4 +187,3 @@ https://github.com/sts/smailr/issues
 ## WHO
 
 Stefan Schlesinger / sts@ono.at / @stsonoat / http://sts.ono.at
-

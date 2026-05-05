@@ -84,6 +84,24 @@ class SmailrCliTest < Minitest::Test
     assert_equal [["user@example.com", "secret"]], calls
   end
 
+  def test_ask_password_retries_until_valid_password_is_entered
+    answers = %w[shrt shrt correctpw correctpw]
+    prompts = []
+
+    @cli.define_singleton_method(:ask) do |prompt, &_block|
+      prompts << prompt
+      answers.shift
+    end
+
+    out, = capture_io do
+      password = @cli.ask_password
+      assert_equal "correctpw", password
+    end
+
+    assert_equal ["Password: ", "Confirm: ", "Password: ", "Confirm: "], prompts
+    assert_includes out, "Too short; try again."
+  end
+
   def test_add_alias_splits_destinations
     calls = []
 

@@ -27,22 +27,24 @@ module Smailr
     # Returns a string containing the entered password if password and
     # confirmation match.
     def ask_password
-        min_password_length = Smailr.config["password_policy"]["length"]
+        min_password_length = Smailr.config["password_policy"]["length"].to_i
 
-        password = ask("Password: ") { |q| q.echo = "*" }
-        confirm  = ask("Confirm: ")  { |q| q.echo = "*" }
+        loop do
+          password = ask("Password: ") { |q| q.echo = "*" }
+          confirm  = ask("Confirm: ")  { |q| q.echo = "*" }
 
-        if password != confirm
+          if password != confirm
             say("Mismatch; try again.")
-            ask_password
-        end
+            next
+          end
 
-        if password.length < min_password_length.to_i
+          if password.length < min_password_length
             say("Too short; try again.")
-            ask_password
-        end
+            next
+          end
 
-        password
+          return password
+        end
     end
 
     # Initialize the Cli
