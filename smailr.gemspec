@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     s.add_runtime_dependency 'commander', '~> 4.3'
     s.add_runtime_dependency 'sequel', '>= 5.0', '< 6.0'
     s.add_runtime_dependency 'bcrypt', '~> 3.1'
+    s.add_runtime_dependency 'logger'
     s.add_runtime_dependency 'net-smtp'
     s.add_development_dependency 'minitest'
     s.add_development_dependency 'minitest-mock'
