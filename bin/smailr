@@ -12,4 +12,11 @@ require 'smailr'
 require 'smailr/cli'
 require 'smailr/setup'
 
+begin
+  Smailr.initialize!
+rescue Smailr::ConfigurationError => e
+  warn "ERROR: #{e.message}"
+  exit 1
+end
+
 Smailr::Cli.new.run

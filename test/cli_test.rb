@@ -110,6 +110,21 @@ class SmailrCliTest < Minitest::Test
     assert_includes out, "a: alias@example.com > user@example.net"
   end
 
+  def test_ls_with_unknown_domain_exits_with_error
+    error = nil
+
+    _, stderr = capture_io do
+      Smailr::Model::Domain.stub(:[], nil) do
+        error = assert_raises(SystemExit) do
+          invoke(:ls, ["asdf.com"])
+        end
+      end
+    end
+
+    assert_equal 1, error.status
+    assert_includes stderr, "No such domain: asdf.com"
+  end
+
   def test_ls_lists_all_domains_without_argument
     dataset = Object.new
     dataset.define_singleton_method(:all) do

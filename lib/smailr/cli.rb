@@ -106,6 +106,11 @@ module Smailr
           case args[0]
           when /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i then
             domain = Smailr::Model::Domain[:fqdn => args[0]]
+            unless domain
+              error "No such domain: #{args[0]}"
+              exit 1
+            end
+
             domain.mailboxes.each do |mbox|
               puts "m: #{mbox.localpart}@#{args[0]}"
             end

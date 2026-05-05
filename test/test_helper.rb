@@ -6,15 +6,6 @@ require "minitest/mock"
 require "net/smtp"
 require "socket"
 
-module Smailr
-  VERSION = "test" unless const_defined?(:VERSION)
-
-  class << self
-    attr_accessor :config
-    attr_accessor :migrations_directory
-  end
-end
-
 class TestOptions
   def initialize(values = {})
     @values = values.transform_keys(&:to_sym)
@@ -53,4 +44,5 @@ class TestOptions
 end
 
 require "sequel/extensions/migration"
+require "smailr"
 require "smailr/cli"

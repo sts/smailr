@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
                            from the shell. It currently uses SQLite as a backend, samples for Dovecot/Exim provided.'
 
     s.license           = 'Apache-2.0'
+    s.required_ruby_version = '>= 3.1'
     s.files             = Dir.glob("{bin,lib,contrib,migrations}/**/*") + %w{README.md smailr.yml}
     s.bindir            = 'bin'
 

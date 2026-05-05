@@ -20,27 +20,61 @@ module Smailr
 
   # Exception Classes
   class MissingDomain < StandardError ; end
+  class ConfigurationError < StandardError ; end
 
   class << self;
     attr_accessor :config
     attr_accessor :config_files
-    attr_accessor :load_config
     attr_accessor :contrib_directory
     attr_accessor :migrations_directory
+    attr_accessor :bundled_config_file
   end
 
   def self.load_config
     config = {}
-    config_files.each do |f|
-      if File.readable?(f)
-        config.merge!(YAML.load_file(f))
+    runtime_config_files = config_files.reject { |f| f == bundled_config_file }
+    readable_runtime_config_files = runtime_config_files.select { |f| File.file?(f) && File.readable?(f) }
+    unreadable_runtime_config_files = runtime_config_files.select { |f| File.exist?(f) && !File.readable?(f) }
+
+    if readable_runtime_config_files.empty?
+      if unreadable_runtime_config_files.any?
+        raise ConfigurationError, "Cannot read configuration file: #{unreadable_runtime_config_files.join(', ')}"
       end
+
+      raise ConfigurationError, "Cannot find configuration file. Checked: #{runtime_config_files.join(', ')}"
     end
+
+    if bundled_config_file && File.readable?(bundled_config_file)
+      config.merge!(YAML.load_file(bundled_config_file) || {})
+    end
+
+    readable_runtime_config_files.each do |f|
+      config.merge!(YAML.load_file(f) || {})
+    end
+
     self.config = config
   end
 
   def self.db_connect
+    unless self.config && self.config['database']
+      raise ConfigurationError, "Configuration file is missing database settings."
+    end
+
     Sequel.connect(self.config['database'])
+  rescue Sequel::DatabaseConnectionError => e
+    raise ConfigurationError, "Cannot open database connection: #{e.message}"
+  end
+
+  def self.initialize!
+    load_config
+
+    unless defined?(Smailr::Model)
+      require 'smailr/model'
+    end
+
+    Smailr.send(:remove_const, :DB) if Smailr.const_defined?(:DB, false)
+    Smailr.const_set(:DB, db_connect)
+    Smailr::DB.sql_log_level = :debug
   end
 
   def self.logger
@@ -65,8 +99,5 @@ end
 
 Smailr.contrib_directory    ||= File.expand_path('../../contrib', __FILE__)
 Smailr.migrations_directory ||= File.expand_path('../../migrations', __FILE__)
-Smailr.config_files         ||= [ File.expand_path('../../smailr.yml', __FILE__),  '/etc/smailr.yml']
-Smailr.load_config
-Smailr::DB = Smailr::db_connect
-require 'smailr/model'
-Smailr::DB.sql_log_level = :debug
+Smailr.bundled_config_file  ||= File.expand_path('../../smailr.yml', __FILE__)
+Smailr.config_files         ||= [ Smailr.bundled_config_file, '/etc/smailr.yml' ]
