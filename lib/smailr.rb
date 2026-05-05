@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'smailr/version'
 
 require 'fileutils'
 require 'logger'
@@ -19,8 +20,6 @@ module Smailr
 
   # Exception Classes
   class MissingDomain < StandardError ; end
-
-  VERSION = '0.8.1'
 
   class << self;
     attr_accessor :config
