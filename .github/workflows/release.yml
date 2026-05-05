@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Publish gem
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+
+      - name: Syntax check
+        run: ruby -c bin/smailr lib/smailr.rb lib/smailr/*.rb
+
+      - name: Run test suite
+        run: bundle exec ruby -Itest -e 'Dir["test/**/*_test.rb"].sort.each { |file| require File.expand_path(file) }'
+
+      - name: Configure RubyGems credentials
+        uses: rubygems/configure-rubygems-credentials@v2
+
+      - name: Build gem
+        run: gem build smailr.gemspec
+
+      - name: Publish gem
+        run: gem push smailr-*.gem
