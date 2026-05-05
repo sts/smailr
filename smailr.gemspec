@@ -6,7 +6,7 @@ require 'smailr'
 Gem::Specification.new do |s|
     s.name              = 'smailr'
     s.version           = Smailr::VERSION
-    s.date              = '2016-01-19'
+    s.date              = '2026-05-05'
     s.authors           = 'Stefan Schlesinger'
     s.email             = 'sts@ono.at'
     s.homepage          = 'http://github.com/sts/smailr'
@@ -21,8 +21,11 @@ Gem::Specification.new do |s|
 
     s.executables       << 'smailr'
     s.add_runtime_dependency 'commander', '~> 4.3'
-    s.add_runtime_dependency 'sequel', '~> 4.26'
+    s.add_runtime_dependency 'sequel', '>= 5.0', '< 6.0'
     s.add_runtime_dependency 'bcrypt', '~> 3.1'
+    s.add_runtime_dependency 'net-smtp'
+    s.add_development_dependency 'minitest'
+    s.add_development_dependency 'minitest-mock'
 
     s.requirements      << 'Exim'
     s.requirements      << 'Dovecot'
