@@ -61,4 +61,63 @@ class SmailrStartupTest < Minitest::Test
 
     assert_equal "Configuration file is missing database settings.", error.message
   end
+
+  def test_initialize_sets_database_before_loading_models
+    database = Object.new
+    database.define_singleton_method(:sql_log_level=) { |_level| }
+    previous_model = Sequel::Model.instance_variable_get(:@db)
+    loaded_model = false
+
+    Smailr.config_files = ["/tmp/missing.yml", "/tmp/runtime.yml"]
+
+    Smailr.stub(:load_config, { "database" => { "adapter" => "sqlite", "database" => "test.sqlite3" } }) do
+      Smailr.stub(:db_connect, database) do
+        Smailr.stub(:require, ->(feature) {
+          if feature == "smailr/model"
+            loaded_model = true
+            assert_same database, Smailr::DB
+            assert_same database, Sequel::Model.db
+          end
+          true
+        }) do
+          Smailr.send(:remove_const, :Model) if Smailr.const_defined?(:Model, false)
+          Smailr.initialize!
+        end
+      end
+    end
+
+    assert loaded_model
+  ensure
+    Sequel::Model.db = previous_model if previous_model
+    Smailr.send(:remove_const, :DB) if Smailr.const_defined?(:DB, false)
+    Smailr.send(:remove_const, :Model) if Smailr.const_defined?(:Model, false)
+  end
+
+  def test_bin_version_works_without_configuration
+    stdout, stderr, status = Open3.capture3(
+      RbConfig.ruby,
+      "-Ilib",
+      File.expand_path("../bin/smailr", __dir__),
+      "--version"
+    )
+
+    assert status.success?
+    assert_equal "smailr #{Smailr::VERSION}\n", stdout
+    refute_includes stderr, "ERROR:"
+    refute_includes stderr, "Cannot find configuration file"
+  end
+
+  def test_bin_version_command_works_without_configuration
+    stdout, stderr, status = Open3.capture3(
+      RbConfig.ruby,
+      "-Ilib",
+      File.expand_path("../bin/smailr", __dir__),
+      "version"
+    )
+
+    assert status.success?
+    assert_equal "smailr #{Smailr::VERSION}\n", stdout
+    refute_includes stderr, "ERROR:"
+    refute_includes stderr, "Cannot find configuration file"
+  end
 end

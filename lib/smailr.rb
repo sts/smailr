@@ -67,13 +67,16 @@ module Smailr
 
   def self.initialize!
     load_config
+    database = db_connect
+
+    Smailr.send(:remove_const, :DB) if Smailr.const_defined?(:DB, false)
+    Smailr.const_set(:DB, database)
+    Sequel::Model.db = database
 
     unless defined?(Smailr::Model)
       require 'smailr/model'
     end
 
-    Smailr.send(:remove_const, :DB) if Smailr.const_defined?(:DB, false)
-    Smailr.const_set(:DB, db_connect)
     Smailr::DB.sql_log_level = :debug
   end
 

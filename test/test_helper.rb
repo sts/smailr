@@ -4,6 +4,8 @@ $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "minitest/autorun"
 require "minitest/mock"
 require "net/smtp"
+require "open3"
+require "rbconfig"
 require "socket"
 
 class TestOptions
