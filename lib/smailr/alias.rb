@@ -2,10 +2,11 @@ module Smailr
   class Alias
     def self.add(source, destinations)
       srclocalpart, srcdomain = source.split('@')
+      domain = Model::Domain[:fqdn => srcdomain]
 
       # We don't want aliases for non-local domains, since the
       # exim router won't accept it.
-      if not Model::Domain[:fqdn => srcdomain].exists?
+      unless domain
         raise MissingDomain, "You are trying to add an alias for a non existing domain: #{source}"
       end
 
@@ -14,7 +15,7 @@ module Smailr
 
         Smailr::logger.warn("Adding alias: #{source} -> #{dst}")
 
-        Model::Alias.find_or_create(:domain       => Model::Domain[:fqdn => srcdomain],
+        Model::Alias.find_or_create(:domain       => domain,
                                     :localpart    => srclocalpart,
                                     :dstdomain    => dstdomain,
                                     :dstlocalpart => dstlocalpart)

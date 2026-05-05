@@ -107,7 +107,7 @@ module Smailr
           when /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i then
             domain = Smailr::Model::Domain[:fqdn => args[0]]
             unless domain
-              error "No such domain: #{args[0]}"
+              say_error "No such domain: #{args[0]}"
               exit 1
             end
 
@@ -124,7 +124,7 @@ module Smailr
               puts d[:fqdn]
             end
           else
-            error "You can either list a domains or a domains addresses."
+            say_error "You can either list a domains or a domains addresses."
             exit 1
           end
         end
