@@ -1,4 +1,4 @@
-source :rubygems
+source "https://rubygems.org"
 
 gem 'sqlite3'
 gem 'sequel', '>= 5.0', '< 6.0'
