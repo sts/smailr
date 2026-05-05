@@ -35,7 +35,7 @@ jobs:
         run: bundle exec ruby -Itest -e 'Dir["test/**/*_test.rb"].sort.each { |file| require File.expand_path(file) }'
 
       - name: Configure RubyGems credentials
-        uses: rubygems/configure-rubygems-credentials@v2
+        uses: rubygems/configure-rubygems-credentials@main
 
       - name: Build gem
         run: gem build smailr.gemspec
