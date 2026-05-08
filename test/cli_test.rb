@@ -360,6 +360,57 @@ class SmailrCliTest < Minitest::Test
     assert_equal "check-auth-root=example.net@verifier.port25.com", sent[:to]
   end
 
+  def test_determine_object_returns_domain_for_domain_string
+    assert_equal :domain, @cli.determine_object("example.com")
+    assert_equal :domain, @cli.determine_object("sub.example.com")
+    assert_equal :domain, @cli.determine_object("my-host.example.org")
+  end
+
+  def test_determine_object_returns_address_for_email_string
+    assert_equal :address, @cli.determine_object("user@example.com")
+    assert_equal :address, @cli.determine_object("user.name+tag@example.org")
+  end
+
+  def test_determine_object_returns_nil_for_unrecognized_input
+    assert_nil @cli.determine_object("not-valid")
+    assert_nil @cli.determine_object("@badformat")
+    assert_nil @cli.determine_object("justtext")
+  end
+
+  def test_ask_password_retries_when_passwords_do_not_match
+    answers = %w[password1 different password1 password1]
+    prompts = []
+
+    @cli.define_singleton_method(:ask) do |prompt, &_block|
+      prompts << prompt
+      answers.shift
+    end
+
+    out, = capture_io do
+      password = @cli.ask_password
+      assert_equal "password1", password
+    end
+
+    assert_equal ["Password: ", "Confirm: ", "Password: ", "Confirm: "], prompts
+    assert_includes out, "Mismatch; try again."
+  end
+
+  def test_add_does_nothing_for_unrecognized_argument_type
+    out, = capture_io do
+      invoke(:add, ["not-a-valid-argument"])
+    end
+
+    assert_empty out.strip
+  end
+
+  def test_rm_does_nothing_for_unrecognized_argument_type
+    out, = capture_io do
+      invoke(:rm, ["not-a-valid-argument"])
+    end
+
+    assert_empty out.strip
+  end
+
   private
 
   def command(name)

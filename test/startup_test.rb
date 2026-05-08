@@ -120,4 +120,75 @@ class SmailrStartupTest < Minitest::Test
     refute_includes stderr, "ERROR:"
     refute_includes stderr, "Cannot find configuration file"
   end
+
+  def test_load_config_merges_bundled_and_runtime_config_files
+    Dir.mktmpdir do |dir|
+      bundled = File.join(dir, "bundled.yml")
+      runtime = File.join(dir, "smailr.yml")
+
+      File.write(bundled, "---\ndatabase:\n  adapter: sqlite\n  database: bundled.sqlite3\nshared_key: from_bundled\n")
+      File.write(runtime, "---\nshared_key: from_runtime\nextra_key: only_in_runtime\n")
+
+      Smailr.bundled_config_file = bundled
+      Smailr.config_files = [bundled, runtime]
+
+      Smailr.load_config
+
+      assert_equal "from_runtime",     Smailr.config["shared_key"]
+      assert_equal "only_in_runtime",  Smailr.config["extra_key"]
+      assert_equal "bundled.sqlite3",  Smailr.config["database"]["database"]
+    end
+  end
+
+  def test_load_config_applies_bundled_defaults_when_not_overridden_by_runtime
+    Dir.mktmpdir do |dir|
+      bundled = File.join(dir, "bundled.yml")
+      runtime = File.join(dir, "smailr.yml")
+
+      File.write(bundled, "---\nbundled_only: yes\ndatabase:\n  adapter: sqlite\n")
+      File.write(runtime, "---\nruntime_only: yes\n")
+
+      Smailr.bundled_config_file = bundled
+      Smailr.config_files = [bundled, runtime]
+
+      Smailr.load_config
+
+      assert_equal "yes", Smailr.config["bundled_only"]
+      assert_equal "yes", Smailr.config["runtime_only"]
+    end
+  end
+
+  def test_logger_returns_a_logger_instance
+    Smailr.instance_variable_set(:@logger, nil)
+
+    logger = Smailr.logger
+
+    assert_instance_of Logger, logger
+  ensure
+    Smailr.instance_variable_set(:@logger, nil)
+  end
+
+  def test_logger_can_be_replaced_with_a_custom_logger
+    custom_logger = Object.new
+    original_logger = Smailr.instance_variable_get(:@logger)
+
+    Smailr.logger = custom_logger
+
+    assert_same custom_logger, Smailr.logger
+  ensure
+    Smailr.instance_variable_set(:@logger, original_logger)
+  end
+
+  def test_db_connect_raises_when_sequel_cannot_connect
+    Smailr.config = { "database" => { "adapter" => "sqlite", "database" => ":memory:" } }
+
+    Sequel.stub(:connect, ->(*) { raise Sequel::DatabaseConnectionError, "connection refused" }) do
+      error = assert_raises(Smailr::ConfigurationError) do
+        Smailr.db_connect
+      end
+
+      assert_includes error.message, "Cannot open database connection:"
+      assert_includes error.message, "connection refused"
+    end
+  end
 end
