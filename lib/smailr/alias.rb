@@ -1,7 +1,7 @@
 module Smailr
   class Alias
     def self.add(source, destinations)
-      srclocalpart, srcdomain = source.split('@')
+      srclocalpart, srcdomain = Smailr::Address.parse_address(source) || source.split('@', 2)
       domain = Model::Domain[:fqdn => srcdomain]
 
       # We don't want aliases for non-local domains, since the
@@ -11,7 +11,7 @@ module Smailr
       end
 
       destinations.each do |dst|
-        dstlocalpart, dstdomain = dst.split('@')
+        dstlocalpart, dstdomain = Smailr::Address.parse_address(dst) || dst.split('@', 2)
 
         Smailr::logger.warn("Adding alias: #{source} -> #{dst}")
 
@@ -23,12 +23,12 @@ module Smailr
     end
 
     def self.rm(source, destinations)
-      srclocalpart, srcdomain = source.split('@')
+      srclocalpart, srcdomain = Smailr::Address.parse_address(source) || source.split('@', 2)
 
       destinations.each do |dst|
         Smailr::logger.warn("Removing alias: #{source} -> #{dst}")
 
-        dstlocalpart, dstdomain = dst.split('@')
+        dstlocalpart, dstdomain = Smailr::Address.parse_address(dst) || dst.split('@', 2)
 
         Model::Alias.filter(:domain       => Model::Domain[:fqdn => srcdomain],
                             :localpart    => srclocalpart,

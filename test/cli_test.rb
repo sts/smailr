@@ -112,6 +112,12 @@ class SmailrCliTest < Minitest::Test
     assert_equal [["alias@example.com", ["user1@example.com", "user2@example.com"]]], calls
   end
 
+  def test_determine_object_accepts_long_tlds_and_idn_inputs
+    assert_equal :domain, @cli.determine_object("example.technology")
+    assert_equal :domain, @cli.determine_object("bücher.ch")
+    assert_equal :address, @cli.determine_object("user@bücher.ch")
+  end
+
   def test_ls_lists_mailboxes_and_aliases_for_domain
     domain = DomainRow.new(
       [MailboxRow.new("user")],
@@ -126,6 +132,19 @@ class SmailrCliTest < Minitest::Test
 
     assert_includes out, "m: user@example.com"
     assert_includes out, "a: alias@example.com > user@example.net"
+  end
+
+  def test_ls_normalizes_idn_domain_before_lookup
+    domain = DomainRow.new([], [])
+    lookups = []
+
+    capture_io do
+      Smailr::Model::Domain.stub(:[], ->(criteria) { lookups << criteria; domain }) do
+        invoke(:ls, ["bücher.ch"])
+      end
+    end
+
+    assert_equal [{ fqdn: "xn--bcher-kva.ch" }], lookups
   end
 
   def test_ls_with_unknown_domain_exits_with_error

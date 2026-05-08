@@ -1,6 +1,8 @@
 module Smailr
   class Dkim
     def self.add(fqdn, selector)
+      fqdn = Smailr::Address.normalize_domain(fqdn) || fqdn
+
       unless Model::Domain[:fqdn => fqdn]
         raise MissingDomain, "You trying to add a DKIM key for a non existing domain: #{fqdn}"
       end
@@ -18,6 +20,7 @@ module Smailr
     end
 
     def self.rm(fqdn, selector)
+      fqdn = Smailr::Address.normalize_domain(fqdn) || fqdn
       dkim = Model::Dkim.for_domain(fqdn, selector)
       dkim.destroy
     end

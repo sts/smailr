@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
 
     s.executables       << 'smailr'
     s.add_runtime_dependency 'commander', '~> 4.3'
+    s.add_runtime_dependency 'addressable', '~> 2.9'
     s.add_runtime_dependency 'sequel', '>= 5.0', '< 6.0'
     s.add_runtime_dependency 'bcrypt', '~> 3.1'
     s.add_runtime_dependency 'logger'

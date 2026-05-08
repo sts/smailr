@@ -18,10 +18,12 @@ module Smailr
       many_to_one :domain
 
       def self.for_domain(fqdn, selector)
+        fqdn = Smailr::Address.normalize_domain(fqdn) || fqdn
         self[:domain => Domain[:fqdn => fqdn], :selector => selector]
       end
 
       def self.for_domain!(fqdn, selector)
+        fqdn = Smailr::Address.normalize_domain(fqdn) || fqdn
         find_or_create(:domain => Domain[:fqdn => fqdn], :selector => selector)
       end
     end
@@ -52,16 +54,17 @@ module Smailr
       end
 
       def self.domain(fqdn)
+        fqdn = Smailr::Address.normalize_domain(fqdn) || fqdn
         Domain[:fqdn => fqdn]
       end
 
       def self.for_address(address)
-        localpart, fqdn = address.split('@')
+        localpart, fqdn = Smailr::Address.parse_address(address) || address.split('@', 2)
         self[:localpart => localpart, :domain => domain(fqdn)]
       end
 
       def self.for_address!(address)
-        localpart, fqdn = address.split('@')
+        localpart, fqdn = Smailr::Address.parse_address(address) || address.split('@', 2)
         find_or_create(:localpart => localpart, :domain => domain(fqdn))
       end
 

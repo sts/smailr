@@ -11,6 +11,7 @@ require 'yaml'
 require 'date'
 require 'openssl'
 
+require 'smailr/address'
 require 'smailr/alias'
 require 'smailr/dkim'
 require 'smailr/domain'

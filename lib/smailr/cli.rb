@@ -18,8 +18,8 @@ module Smailr
     #
     # Returns either :domain or :address
     def determine_object(string)
-        return :domain  if string =~ /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i
-        return :address if string =~ /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}$/i
+        return :domain  if Smailr::Address.normalize_domain(string)
+        return :address if Smailr::Address.normalize_address(string)
     end
 
     # Run an interactive cli dialog to enter and confirm a password.
@@ -105,9 +105,11 @@ module Smailr
         c.syntax  = 'smailr ls [domain]'
         c.summary = 'List domains or mailboxes and aliases of a specific domain.'
         c.action do |args, options|
-          case args[0]
-          when /^[^@][A-Z0-9.-]+\.[A-Z]{2,6}$/i then
-            domain = Smailr::Model::Domain[:fqdn => args[0]]
+          domain_name = Smailr::Address.normalize_domain(args[0])
+
+          case
+          when domain_name
+            domain = Smailr::Model::Domain[:fqdn => domain_name]
             unless domain
               say_error "No such domain: #{args[0]}"
               exit 1
@@ -217,7 +219,7 @@ module Smailr
           "Requires that mutt is installed and tries to find a suitable maildir in: " + base
         c.example       'Open test@example.com', 'smailr mutt test@example.com'
         c.action do |args,options|
-          localpart, fqdn = args[0].split('@')
+          localpart, fqdn = Smailr::Address.parse_address(args[0]) || args[0].split('@', 2)
 
           mutt = `command -v mutt || { echo "Please install mutt first. Aborting." >&2; exit 1; }`
           if $?
@@ -251,10 +253,10 @@ module Smailr
         c.option        '-r DESTINATION', '--report-to DESTINATION', String, 'Send the report to the specified address instead.'
 
         c.action do |args,options|
-          from = args[0]
+          from = Smailr::Address.normalize_address(args[0]) || args[0]
           options.default :report_to => from
 
-          dstlocalpart, dstfqdn = options.report_to.split('@')
+          dstlocalpart, dstfqdn = Smailr::Address.parse_address(options.report_to) || options.report_to.split('@', 2)
 
           require 'socket'
           require 'date'
