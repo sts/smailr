@@ -10,8 +10,20 @@ class SmailrAddressTest < Minitest::Test
     assert_equal "user@xn--bcher-kva.ch", Smailr::Address.normalize_address("user@bücher.ch")
   end
 
+  def test_normalize_address_rejects_invalid_addresses
+    assert_nil Smailr::Address.normalize_address("missing-at-sign")
+    assert_nil Smailr::Address.normalize_address("user@@example.com")
+    assert_nil Smailr::Address.normalize_address("@example.com")
+    assert_nil Smailr::Address.normalize_address("user@")
+    assert_nil Smailr::Address.normalize_address("us er@example.com")
+  end
+
   def test_normalize_domain_rejects_invalid_domain
     assert_nil Smailr::Address.normalize_domain("not a domain")
+    assert_nil Smailr::Address.normalize_domain("")
+    assert_nil Smailr::Address.normalize_domain("exa_mple.com")
+    assert_nil Smailr::Address.normalize_domain("#{"a" * 64}.com")
+    assert_nil Smailr::Address.normalize_domain("#{'a.' * 127}aa")
   end
 end
 
