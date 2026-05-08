@@ -23,6 +23,7 @@ class SmailrAddressTest < Minitest::Test
     assert_nil Smailr::Address.normalize_domain("")
     assert_nil Smailr::Address.normalize_domain("exa_mple.com")
     assert_nil Smailr::Address.normalize_domain("#{"a" * 64}.com")
+    assert_nil Smailr::Address.normalize_domain("#{'a.' * 126}aaaa")
     assert_nil Smailr::Address.normalize_domain("#{'a.' * 127}aa")
   end
 end

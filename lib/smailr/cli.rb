@@ -105,27 +105,28 @@ module Smailr
         c.syntax  = 'smailr ls [domain]'
         c.summary = 'List domains or mailboxes and aliases of a specific domain.'
         c.action do |args, options|
-          domain_name = Smailr::Address.normalize_domain(args[0])
+          argument = args[0]
+          domain_name = Smailr::Address.normalize_domain(argument)
 
           case
-          when domain_name
-            domain = Smailr::Model::Domain[:fqdn => domain_name]
-            unless domain
-              say_error "No such domain: #{args[0]}"
-              exit 1
-            end
-
-            domain.mailboxes.each do |mbox|
-              puts "m: #{mbox.localpart}@#{args[0]}"
-            end
-            domain.aliases.each do |aliass|
-              puts "a: #{aliass.localpart}@#{args[0]} > #{aliass.dstlocalpart}@#{aliass.dstdomain}"
-            end
-          when nil
+          when argument.nil?
             domains = Smailr::DB[:domains]
             domains.all.each do |d|
               domain = Smailr::Model::Domain[:fqdn => d[:fqdn]]
               puts d[:fqdn]
+            end
+          when domain_name
+            domain = Smailr::Model::Domain[:fqdn => domain_name]
+            unless domain
+              say_error "No such domain: #{argument}"
+              exit 1
+            end
+
+            domain.mailboxes.each do |mbox|
+              puts "m: #{mbox.localpart}@#{argument}"
+            end
+            domain.aliases.each do |aliass|
+              puts "a: #{aliass.localpart}@#{argument} > #{aliass.dstlocalpart}@#{aliass.dstdomain}"
             end
           else
             say_error "You can either list a domains or a domains addresses."
